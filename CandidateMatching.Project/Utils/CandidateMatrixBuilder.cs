@@ -3,20 +3,22 @@ using CandidateMatching.Domain;
 namespace CandidateMatching.Utils;
 
 // TODO: add logger
-public class CandidateMatrixBuilder(int criteriaColumns)
+public class CandidateMatrixBuilder()
 {
+    private int _cols { get; set; } = 0;
     private readonly List<List<int>> _matrixSkeleton = new List<List<int>>();
-    private int _cols { get; set; } = criteriaColumns;
 
-    public void AddRows(List<CandidateRankingDto> candidates)
+    public void AddRows(List<CandidateDto> candidates)
     {
         foreach (var c in candidates)
         {
             AddRow(c);
         }
     }
-    public void AddRow(CandidateRankingDto candidate)
+    public void AddRow(CandidateDto candidate)
     {
+        if (_cols == 0) _cols = candidate.CriteriaVals.Count;
+        
         if (candidate.CriteriaVals?.Count != _cols)
         {
             Console.WriteLine($"Error: Candidate criteria amount does not match Matrix columns");

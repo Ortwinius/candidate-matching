@@ -25,7 +25,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-// var candidates = new List<CandidateRankingDto>
+// var candidates = new List<CandidateDto>
 // {
 //     new() { Name = "Elena", CriteriaVals = [15, 40, 25, 40] },
 //     new() { Name = "Marcus", CriteriaVals = [20, 30, 20, 35] },
@@ -52,25 +52,19 @@ app.MapControllers();
 // var correctIdealSolutionSeparation = new double[] { 0.124, 0.122, 0.108 };
 // var correctNegativeIdealSolutionSeparation = new double[] { 0.117, 0.091, 0.147 };
 
-var candidates = new List<CandidateRankingDto>
+var candidates = new List<CandidateDto>
 {
     new() { Name = "Bob", CriteriaVals = [35, 90, 80, 40] },
     new() { Name = "Anna", CriteriaVals = [90, 15, 75, 30] },
     new() { Name = "Karl", CriteriaVals = [85, 10, 95, 70] },
     new() { Name = "Johanna", CriteriaVals = [95, 70, 45, 80] },
-    new() { Name = "Mohammed", CriteriaVals = [10, 90, 70, 85] }
+    new() { Name = "Mohammed", CriteriaVals = [10, 90, 70, 85] },
 };
 
 var weights = new double[] { 0.3, 0.2, 0.2, 0.3 };  
 
-// TODO: put matrixbuilder into rankingService? or own service
-
-var matrixBuilder = new CandidateMatrixBuilder(criteriaColumns: 4);
-matrixBuilder.AddRows(candidates);
-var matrix = matrixBuilder.Build();
-
 using var scope = app.Services.CreateScope();
 var rankingService = scope.ServiceProvider.GetRequiredService<IRankingService>();
-var ranking = rankingService.PerformRanking(matrix, weights);
+var ranking = rankingService.PerformRanking(candidates, weights);
 
 app.Run();

@@ -2,43 +2,37 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Net.WebSockets;
 using System.Reflection.Emit;
+using CandidateMatching.Domain;
 using CandidateMatching.Utils;
 
 namespace CandidateMatching.Services;
 
-public sealed record Ideals(double[] Ideal, double[] AntiIdeal);
-
-public sealed record IdealDistances(double IdealDistance, double AntiIdealDistance);
-
 // Topsis Implementation of Ranking
 public class TopsisRankingService(ILogger<TopsisRankingService> _logger): IRankingService
 {
-    public double[] PerformRanking(double[,] decisionMatrix, double[] weights)
+    public RankingResultDto PerformRanking(List<CandidateDto> candidates, double[] weights)
     {
         _logger.Log(LogLevel.Information, "Starting ranking process");
         
-        var normalized = GetNormalizedMatrix(decisionMatrix);
+        var matrixBuilder = new CandidateMatrixBuilder();
+        matrixBuilder.AddRows(candidates);
+        var matrix = matrixBuilder.Build();
+            
+        var normalized = GetNormalizedMatrix(matrix);
         var weightedNormalized = GetWeightedNormalizedMatrix(normalized, weights);
         var ideals = GetIdealSolutions(weightedNormalized);
         var distances = GetDistancesToIdealSolutions(weightedNormalized, ideals);
         var closenessFactors = GetRelativeClosenessToIdeal(distances);
+        var ranking = MapCandidatesToResults(closenessFactors, candidates);
         
         MDebug.PrintMatrix(weightedNormalized, label: "Normalized (without weights)");
         MDebug.PrintMatrix(weightedNormalized, label: "Weighted Normalized");
-        MDebug.PrintVector(ideals.Ideal, label: "Best Possible (A*)", precision: 5);
-        MDebug.PrintVector(ideals.AntiIdeal, label: "Worst Possible (A-)", precision: 5);
-
-        Console.WriteLine("\n");
-        
-        foreach(var d in distances)
-        {
-            Console.WriteLine($"D+ ({d.IdealDistance:F3}) | D- ({d.AntiIdealDistance:F3})");    
-        }
-
-        Console.WriteLine("\n");
-
-        MDebug.PrintVector(closenessFactors, label:"Closeness Factors (Results)", precision: 5);        
-        return [];
+        MDebug.PrintVector(ideals.Ideal, label: "Best Possible (A*)");
+        MDebug.PrintVector(ideals.AntiIdeal, label: "Worst Possible (A-)"); 
+        MDebug.PrintIdealDistances(distances);
+        MDebug.PrintVector(closenessFactors, label:"Closeness Factors (Results)");
+        MDebug.PrintRanking(ranking);
+        return ranking;
     }
 
     // uses vector normalization
@@ -145,10 +139,29 @@ public class TopsisRankingService(ILogger<TopsisRankingService> _logger): IRanki
         return closenessFactors;
     }
 
-    public double GetBestAlternativeIndex(double[] closenessFactors)
+    public RankingResultDto MapCandidatesToResults(double[] closenessFactors, List<CandidateDto> candidates)
     {
-        var max = closenessFactors.Max();
-        var index = closenessFactors.IndexOf(max);
-        return index;
+        var result = new RankingResultDto(new List<CandidateResult>());
+        
+        if (closenessFactors.Length != candidates.Count)
+        {
+            throw new InvalidOperationException("Closeness factors count must equal candidate count");
+        }
+        
+        for(int i = 0; i < candidates.Count; i++)
+        {
+            result.Rankings.Add(new CandidateResult(Candidate: candidates[i], RankingVal: closenessFactors[i]));
+        }
+        
+        // TODO: check for identicals (lexical sorting) 
+        
+        var sorted = SortResults(result);
+        return sorted;
+    }
+
+    public RankingResultDto SortResults(RankingResultDto ranking)
+    {
+        var res = ranking.Rankings.OrderByDescending(x => x.RankingVal).ToList();
+        return new RankingResultDto(res);
     }
 }

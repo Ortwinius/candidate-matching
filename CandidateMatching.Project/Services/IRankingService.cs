@@ -1,8 +1,10 @@
+using CandidateMatching.Domain;
+
 namespace CandidateMatching.Services;
 
 public interface IRankingService
 {
-    double[] PerformRanking(double[,] decisionMatrix, double[] weights);
+    RankingResultDto PerformRanking(List<CandidateDto> candidates, double[] weights);
     double[,] GetNormalizedMatrix(double[,] decisionMatrix);
     double[,] GetWeightedNormalizedMatrix(double[,] normalizedMatrix, double[] weights);
 }
