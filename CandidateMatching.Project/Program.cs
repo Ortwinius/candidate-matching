@@ -1,10 +1,14 @@
+using CandidateMatching.Services;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<IRankingService, TopsisRankingService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// builder.Services.AddOpenApi();
+builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
@@ -18,5 +22,49 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+
+// Testing 
+// 3 candidates with four criterias 
+// var decisionMatrix = new double[3, 4] 
+// { 
+//     { 15, 40, 25, 40 }, 
+//     { 20, 30, 20, 35 }, 
+//     { 30, 10, 30, 15 }
+// };
+// var weights = new double[4] { 0.3, 0.1, 0.4, 0.2 }; // adding up to 1 
+
+
+
+var decisionMatrix = new double[5, 4]
+{
+    { 35, 90, 80, 40 },  // Bob
+    { 90, 15, 75, 30 },  // Anna
+    { 85, 10, 95, 70 },  // Karl
+    { 95, 70, 45, 80 },  // Johanna
+    { 10, 90, 70, 85 }   // Mohammed
+};
+
+var weights = new double[] { 0.3, 0.2, 0.2, 0.3 };  
+// var correctNormalizedMatrix = new double[3, 4]
+// {
+//     { 0.384, 0.784, 0.570, 0.724 },
+//     { 0.512, 0.588, 0.456, 0.634 },
+//     { 0.768, 0.196, 0.684, 0.272 }
+// };
+// var correctNormalizedWeightedMatrix = new double[3, 4]
+// {
+//     { 0.115, 0.078, 0.228, 0.145 },
+//     { 0.154, 0.059, 0.182, 0.127 },
+//     { 0.230, 0.020, 0.274, 0.054 }
+// };
+// var correctIdealSolution = new double[] { 0.230, 0.078, 0.274, 0.145 };
+// var correctNegativeIdealSolution = new double[] { 0.115, 0.020, 0.182, 0.054 };
+// var correctIdealSolutionSeparation = new double[] { 0.124, 0.122, 0.108 };
+// var correctNegativeIdealSolutionSeparation = new double[] { 0.117, 0.091, 0.147 };
+// var correctRelativeClosenessToIdealSolution = new double[] { 0.486, 0.427, 0.576 };
+
+using var scope = app.Services.CreateScope();
+var rankingService = scope.ServiceProvider.GetRequiredService<IRankingService>();
+var ranking = rankingService.PerformRanking(decisionMatrix, weights);
 
 app.Run();

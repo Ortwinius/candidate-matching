@@ -1,6 +1,0 @@
-@CandidateMatchingProject_HostAddress = http://localhost:5094
-
-GET {{CandidateMatchingProject_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
