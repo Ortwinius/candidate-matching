@@ -8,13 +8,23 @@ using CandidateMatching.Utils;
 namespace CandidateMatching.Services;
 
 // Topsis Implementation of Ranking
-public class TopsisRankingService(ILogger<TopsisRankingService> _logger): IRankingService
+public class TopsisRankingService(ILogger<TopsisRankingService> logger): IRankingService
 {
     public RankingResultDto PerformRanking(List<CandidateDto> candidates, double[] weights)
     {
-        _logger.Log(LogLevel.Information, "Starting ranking process");
+        logger.Log(LogLevel.Information, "Starting ranking process");
+
+        if (candidates[0].CriteriaVals.Count != weights.Length)
+        {
+            throw new InvalidOperationException("Amount of criteria must match weights");
+        }
+
+        if (!MHelpers.WeightsAddUptoOne(weights))
+        {
+            throw new InvalidOperationException("Sum of weights must equal 1");
+        }
         
-        var matrixBuilder = new CandidateMatrixBuilder();
+        var matrixBuilder = new MMatrixBuilder();
         matrixBuilder.AddRows(candidates);
         var matrix = matrixBuilder.Build();
             
@@ -25,13 +35,14 @@ public class TopsisRankingService(ILogger<TopsisRankingService> _logger): IRanki
         var closenessFactors = GetRelativeClosenessToIdeal(distances);
         var ranking = MapCandidatesToResults(closenessFactors, candidates);
         
-        MDebug.PrintMatrix(weightedNormalized, label: "Normalized (without weights)");
-        MDebug.PrintMatrix(weightedNormalized, label: "Weighted Normalized");
-        MDebug.PrintVector(ideals.Ideal, label: "Best Possible (A*)");
-        MDebug.PrintVector(ideals.AntiIdeal, label: "Worst Possible (A-)"); 
-        MDebug.PrintIdealDistances(distances);
-        MDebug.PrintVector(closenessFactors, label:"Closeness Factors (Results)");
-        MDebug.PrintRanking(ranking);
+        // MDebug.PrintMatrix(weightedNormalized, label: "Normalized (without weights)", candidates: candidates);
+        // MDebug.PrintMatrix(weightedNormalized, label: "Weighted Normalized", candidates: candidates);
+        // MDebug.PrintVector(ideals.Ideal, label: "Best Possible (A*)");
+        // MDebug.PrintVector(ideals.AntiIdeal, label: "Worst Possible (A-)"); 
+        // MDebug.PrintIdealDistances(distances, candidates: candidates);
+        // MDebug.PrintVector(closenessFactors, label:"Closeness Factors (Results)");
+        // MDebug.PrintRanking(ranking);
+        
         return ranking;
     }
 
@@ -52,7 +63,6 @@ public class TopsisRankingService(ILogger<TopsisRankingService> _logger): IRanki
                 {
                     columnSum += Math.Pow(decisionMatrix[k, j], 2);
                 }
-                // Console.WriteLine($"Current value: {decisionMatrix[i, j]}");
                 resMatrix[i, j] = decisionMatrix[i, j] / Math.Sqrt(columnSum);
             }
         }
@@ -155,13 +165,7 @@ public class TopsisRankingService(ILogger<TopsisRankingService> _logger): IRanki
         
         // TODO: check for identicals (lexical sorting) 
         
-        var sorted = SortResults(result);
+        var sorted = MHelpers.SortResults(result);
         return sorted;
-    }
-
-    public RankingResultDto SortResults(RankingResultDto ranking)
-    {
-        var res = ranking.Rankings.OrderByDescending(x => x.RankingVal).ToList();
-        return new RankingResultDto(res);
     }
 }

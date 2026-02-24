@@ -3,9 +3,9 @@ using CandidateMatching.Domain;
 namespace CandidateMatching.Utils;
 
 // TODO: add logger
-public class CandidateMatrixBuilder()
+public class MMatrixBuilder()
 {
-    private int _cols { get; set; } = 0;
+    private int Cols { get; set; } = 0;
     private readonly List<List<int>> _matrixSkeleton = new List<List<int>>();
 
     public void AddRows(List<CandidateDto> candidates)
@@ -17,9 +17,9 @@ public class CandidateMatrixBuilder()
     }
     public void AddRow(CandidateDto candidate)
     {
-        if (_cols == 0) _cols = candidate.CriteriaVals.Count;
+        if (Cols == 0) Cols = candidate.CriteriaVals.Count;
         
-        if (candidate.CriteriaVals?.Count != _cols)
+        if (candidate.CriteriaVals?.Count != Cols)
         {
             Console.WriteLine($"Error: Candidate criteria amount does not match Matrix columns");
             return;
@@ -27,15 +27,15 @@ public class CandidateMatrixBuilder()
         _matrixSkeleton.Add(candidate.CriteriaVals);
     }
     
-    // outputs a 2-dim matrix with m rows and n cols
+    // outputs a 2-dim matrix with m rows and n Cols
     public double[,] Build()
     {
         var rows = _matrixSkeleton.Count;
-        var matrix = new double[rows, _cols];
+        var matrix = new double[rows, Cols];
 
         for (int i = 0; i < rows; i++)
         {
-            for (int j = 0; j < _cols; j++)
+            for (int j = 0; j < Cols; j++)
             {
                 matrix[i, j] = _matrixSkeleton[i][j];
             }

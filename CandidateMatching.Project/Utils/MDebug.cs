@@ -2,10 +2,11 @@ using CandidateMatching.Domain;
 
 namespace CandidateMatching.Utils;
 
+// TODO: add optional ranking result name so that in hindsight it can be traced back?
 public static class MDebug
 {
     private const int DefaultPrecision = 3;
-    public static void PrintMatrix(double[,] matrix, string? label = "", int? precision = null)
+    public static void PrintMatrix(double[,] matrix, string? label = null, int? precision = null, List<CandidateDto>? candidates = null)
     {
         int precisionVal = precision ?? DefaultPrecision;
         
@@ -25,11 +26,13 @@ public static class MDebug
                 Console.Write($"{matrix[i,j].ToString("F" + precisionVal)} ");
             }
 
-            Console.Write(")\n");
+            Console.Write(")");
+            Console.Write(candidates != null ? $" => {candidates[i].Name}" : String.Empty);
+            Console.Write("\n");
         }
     }
     
-    public static void PrintVector(double[] vec, string? label = "", int? precision = null)
+    public static void PrintVector(double[] vec, string? label = null, int? precision = null)
     {
         int precisionVal = precision ?? DefaultPrecision;
 
@@ -43,34 +46,26 @@ public static class MDebug
         }
     }
 
-    public static void PrintIdealDistances(IdealDistances[] vecPair, string? label = "", int? precision = null)
+    public static void PrintIdealDistances(IdealDistances[] distances, string? label = null, int? precision = null, List<CandidateDto>? candidates = null)
     {
         int precisionVal = precision ?? DefaultPrecision;
         string format = "F" + precisionVal; 
         
-        if (label != String.Empty)
-        {
-            Console.WriteLine($"\n{label}:");
-        }
-        
-        Console.WriteLine(); 
+        Console.WriteLine($"\n\n{label ?? "Ideal Distances"}:");
 
-        foreach (var d in vecPair)
+        for(int i = 0; i < distances.Length; i++)
         {
-            Console.WriteLine($"D+ ({d.IdealDistance.ToString(format)}) | D- ({d.AntiIdealDistance.ToString(format)})");    
+            Console.Write($"D+ ({distances[i].IdealDistance.ToString(format)}) | D- ({distances[i].AntiIdealDistance.ToString(format)})");
+            Console.Write(candidates != null ? $" => {candidates[i].Name}\n" : "\n");
         }
-
-        Console.WriteLine("\n");
     }
 
-    public static void PrintRanking(RankingResultDto ranking, string? label = "", int? precision = null)
+    public static void PrintRanking(RankingResultDto ranking, string? label = null, int? precision = null)
     {
         int precisionVal = precision ?? DefaultPrecision;
         string format = "F" + precisionVal; 
         
-        Console.WriteLine($"\n{label ?? "Final Ranking"}:");
-        
-        Console.WriteLine();
+        Console.WriteLine($"\n\n{label ?? "Final Ranking"}:");
 
         for(int i = 0; i < ranking.Rankings.Count; i++)
         {

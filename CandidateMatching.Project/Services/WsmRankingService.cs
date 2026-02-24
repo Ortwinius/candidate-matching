@@ -1,19 +1,21 @@
-// namespace CandidateMatching.Services;
-//
-// public class WsmRankingService : IRankingService
-// {
-//     public double[] PerformRanking(double[,] decisionMatrix, double[] weights)
-//     {
-//         
-//     }
-//
-//     public double[,] GetNormalizedMatrix(double[,] decisionMatrix)
-//     {
-//         
-//     }
-//
-//     public double[,] GetWeightedNormalizedMatrix(double[,] normalizedMatrix, double[] weights)
-//     {
-//         
-//     }
-// }
+using CandidateMatching.Domain;
+
+namespace CandidateMatching.Services;
+
+public class WsmRankingService : IRankingService
+{
+    public RankingResultDto PerformRanking(List<CandidateDto> candidates, double[] weights)
+    {
+        throw new NotImplementedException();
+    }
+
+    public double[,] GetNormalizedMatrix(double[,] decisionMatrix)
+    {
+        throw new NotImplementedException();
+    }
+
+    public double[,] GetWeightedNormalizedMatrix(double[,] normalizedMatrix, double[] weights)
+    {
+        throw new NotImplementedException();
+    }
+}
