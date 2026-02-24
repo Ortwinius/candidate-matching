@@ -1,4 +1,6 @@
+using CandidateMatching.Domain;
 using CandidateMatching.Services;
+using CandidateMatching.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,28 +25,15 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-// Testing 
-// 3 candidates with four criterias 
-// var decisionMatrix = new double[3, 4] 
-// { 
-//     { 15, 40, 25, 40 }, 
-//     { 20, 30, 20, 35 }, 
-//     { 30, 10, 30, 15 }
+// var candidates = new List<CandidateRankingDto>
+// {
+//     new() { Name = "Elena", CriteriaVals = [15, 40, 25, 40] },
+//     new() { Name = "Marcus", CriteriaVals = [20, 30, 20, 35] },
+//     new() { Name = "Sasha", CriteriaVals = [30, 10, 30, 15] }
 // };
-// var weights = new double[4] { 0.3, 0.1, 0.4, 0.2 }; // adding up to 1 
+//
+// var weights = new double[4] { 0.3, 0.1, 0.4, 0.2 };
 
-
-
-var decisionMatrix = new double[5, 4]
-{
-    { 35, 90, 80, 40 },  // Bob
-    { 90, 15, 75, 30 },  // Anna
-    { 85, 10, 95, 70 },  // Karl
-    { 95, 70, 45, 80 },  // Johanna
-    { 10, 90, 70, 85 }   // Mohammed
-};
-
-var weights = new double[] { 0.3, 0.2, 0.2, 0.3 };  
 // var correctNormalizedMatrix = new double[3, 4]
 // {
 //     { 0.384, 0.784, 0.570, 0.724 },
@@ -59,12 +48,29 @@ var weights = new double[] { 0.3, 0.2, 0.2, 0.3 };
 // };
 // var correctIdealSolution = new double[] { 0.230, 0.078, 0.274, 0.145 };
 // var correctNegativeIdealSolution = new double[] { 0.115, 0.020, 0.182, 0.054 };
+// var correctRelativeClosenessToIdealSolution = new double[] { 0.486, 0.427, 0.576 };
 // var correctIdealSolutionSeparation = new double[] { 0.124, 0.122, 0.108 };
 // var correctNegativeIdealSolutionSeparation = new double[] { 0.117, 0.091, 0.147 };
-// var correctRelativeClosenessToIdealSolution = new double[] { 0.486, 0.427, 0.576 };
+
+var candidates = new List<CandidateRankingDto>
+{
+    new() { Name = "Bob", CriteriaVals = [35, 90, 80, 40] },
+    new() { Name = "Anna", CriteriaVals = [90, 15, 75, 30] },
+    new() { Name = "Karl", CriteriaVals = [85, 10, 95, 70] },
+    new() { Name = "Johanna", CriteriaVals = [95, 70, 45, 80] },
+    new() { Name = "Mohammed", CriteriaVals = [10, 90, 70, 85] }
+};
+
+var weights = new double[] { 0.3, 0.2, 0.2, 0.3 };  
+
+// TODO: put matrixbuilder into rankingService? or own service
+
+var matrixBuilder = new CandidateMatrixBuilder(criteriaColumns: 4);
+matrixBuilder.AddRows(candidates);
+var matrix = matrixBuilder.Build();
 
 using var scope = app.Services.CreateScope();
 var rankingService = scope.ServiceProvider.GetRequiredService<IRankingService>();
-var ranking = rankingService.PerformRanking(decisionMatrix, weights);
+var ranking = rankingService.PerformRanking(matrix, weights);
 
 app.Run();

@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Net.WebSockets;
+using System.Reflection.Emit;
+using CandidateMatching.Utils;
 
 namespace CandidateMatching.Services;
 
@@ -18,28 +20,24 @@ public class TopsisRankingService(ILogger<TopsisRankingService> _logger): IRanki
         var normalized = GetNormalizedMatrix(decisionMatrix);
         var weightedNormalized = GetWeightedNormalizedMatrix(normalized, weights);
         var ideals = GetIdealSolutions(weightedNormalized);
-        
-        PrintMatrix(weightedNormalized);
-        Console.WriteLine($"Best Possible:");
-        PrintVector(ideals.Ideal);
-        Console.WriteLine($"\nWorst Possible:");
-        PrintVector(ideals.AntiIdeal);
-        Console.WriteLine("\n");
-        
         var distances = GetDistancesToIdealSolutions(weightedNormalized, ideals);
+        var closenessFactors = GetRelativeClosenessToIdeal(distances);
+        
+        MDebug.PrintMatrix(weightedNormalized, label: "Normalized (without weights)");
+        MDebug.PrintMatrix(weightedNormalized, label: "Weighted Normalized");
+        MDebug.PrintVector(ideals.Ideal, label: "Best Possible (A*)", precision: 5);
+        MDebug.PrintVector(ideals.AntiIdeal, label: "Worst Possible (A-)", precision: 5);
+
+        Console.WriteLine("\n");
         
         foreach(var d in distances)
         {
-            Console.WriteLine($"Distance to Best: {d.IdealDistance:F3}, to Worst: {d.AntiIdealDistance:F3}");    
+            Console.WriteLine($"D+ ({d.IdealDistance:F3}) | D- ({d.AntiIdealDistance:F3})");    
         }
 
-        var closenessFactors = GetRelativeClosenessToIdeal(distances);
-        
-        foreach(var c in closenessFactors)
-        {
-            Console.WriteLine($"Closeness: {c:F3}");    
-        }
-        
+        Console.WriteLine("\n");
+
+        MDebug.PrintVector(closenessFactors, label:"Closeness Factors (Results)", precision: 5);        
         return [];
     }
 
@@ -152,29 +150,5 @@ public class TopsisRankingService(ILogger<TopsisRankingService> _logger): IRanki
         var max = closenessFactors.Max();
         var index = closenessFactors.IndexOf(max);
         return index;
-    }
-
-    private void PrintMatrix(double[,] matrix)
-    {
-        int m = matrix.GetLength(0);
-        int n = matrix.GetLength(1);
-        for (int i = 0; i < m; i++)
-        {
-            Console.Write("( ");
-            for (int j = 0; j < n; j++)
-            {
-                Console.Write($"{matrix[i,j]:F3} ");
-            }
-
-            Console.Write("),\n");
-        }
-    }
-
-    private void PrintVector(double[] vec)
-    {
-        foreach(var a in vec)
-        {
-            Console.Write($"{a:F3} ");
-        }
     }
 }
