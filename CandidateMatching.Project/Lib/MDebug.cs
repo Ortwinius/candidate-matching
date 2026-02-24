@@ -1,14 +1,14 @@
 using CandidateMatching.Domain;
 
-namespace CandidateMatching.Utils;
+namespace CandidateMatching.Lib;
 
 // TODO: add optional ranking result name so that in hindsight it can be traced back?
 public static class MDebug
 {
-    private const int DefaultPrecision = 3;
+
     public static void PrintMatrix(double[,] matrix, string? label = null, int? precision = null, List<CandidateDto>? candidates = null)
     {
-        int precisionVal = precision ?? DefaultPrecision;
+        int precisionVal = precision ?? MConstants.DefaultPrintingPrecision;
         
         if (!String.IsNullOrEmpty(label))
         {
@@ -34,7 +34,7 @@ public static class MDebug
     
     public static void PrintVector(double[] vec, string? label = null, int? precision = null)
     {
-        int precisionVal = precision ?? DefaultPrecision;
+        int precisionVal = precision ?? MConstants.DefaultPrintingPrecision;
 
         if (label != String.Empty)
         {
@@ -48,7 +48,7 @@ public static class MDebug
 
     public static void PrintIdealDistances(IdealDistances[] distances, string? label = null, int? precision = null, List<CandidateDto>? candidates = null)
     {
-        int precisionVal = precision ?? DefaultPrecision;
+        int precisionVal = precision ?? MConstants.DefaultPrintingPrecision;
         string format = "F" + precisionVal; 
         
         Console.WriteLine($"\n\n{label ?? "Ideal Distances"}:");
@@ -62,7 +62,7 @@ public static class MDebug
 
     public static void PrintRanking(RankingResultDto ranking, string? label = null, int? precision = null)
     {
-        int precisionVal = precision ?? DefaultPrecision;
+        int precisionVal = precision ?? MConstants.DefaultPrintingPrecision;
         string format = "F" + precisionVal; 
         
         Console.WriteLine($"\n\n{label ?? "Final Ranking"}:");

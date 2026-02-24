@@ -3,20 +3,20 @@ using System.Data;
 using System.Net.WebSockets;
 using System.Reflection.Emit;
 using CandidateMatching.Domain;
-using CandidateMatching.Utils;
+using CandidateMatching.Lib;
 
 namespace CandidateMatching.Services;
 
 // Topsis Implementation of Ranking
-public class TopsisRankingService(ILogger<TopsisRankingService> logger): IRankingService
+public class TopsisRankingService(ILogger<TopsisRankingService> logger): RankingService
 {
-    public RankingResultDto PerformRanking(List<CandidateDto> candidates, double[] weights)
+    public override RankingResultDto PerformRanking(List<CandidateDto> candidates, double[] weights)
     {
-        logger.Log(LogLevel.Information, "Starting ranking process");
+        logger.Log(LogLevel.Information, "Starting TOPSIS ranking process");
 
         if (candidates[0].CriteriaVals.Count != weights.Length)
         {
-            throw new InvalidOperationException("Amount of criteria must match weights");
+            throw new ArgumentException("Amount of criteria must match weights");
         }
 
         if (!MHelpers.WeightsAddUptoOne(weights))
@@ -32,7 +32,7 @@ public class TopsisRankingService(ILogger<TopsisRankingService> logger): IRankin
         var weightedNormalized = GetWeightedNormalizedMatrix(normalized, weights);
         var ideals = GetIdealSolutions(weightedNormalized);
         var distances = GetDistancesToIdealSolutions(weightedNormalized, ideals);
-        var closenessFactors = GetRelativeClosenessToIdeal(distances);
+        var closenessFactors = GetTopsisPerformances(distances);
         var ranking = MapCandidatesToResults(closenessFactors, candidates);
         
         // MDebug.PrintMatrix(weightedNormalized, label: "Normalized (without weights)", candidates: candidates);
@@ -45,47 +45,10 @@ public class TopsisRankingService(ILogger<TopsisRankingService> logger): IRankin
         
         return ranking;
     }
-
-    // uses vector normalization
-    public double[,] GetNormalizedMatrix(double[,] decisionMatrix)
+    
+    public override double[,] GetNormalizedMatrix(double[,] decisionMatrix)
     {
-        int m = decisionMatrix.GetLength(0);
-        int n = decisionMatrix.GetLength(1);
-
-        double[,] resMatrix = new double[m,n];
-        
-        for (int i = 0; i < m; i++)
-        {
-            for (int j = 0; j < n; j++)
-            {
-                double columnSum = 0;
-                for (int k = 0; k < m; k++)
-                {
-                    columnSum += Math.Pow(decisionMatrix[k, j], 2);
-                }
-                resMatrix[i, j] = decisionMatrix[i, j] / Math.Sqrt(columnSum);
-            }
-        }
-        
-        return resMatrix;
-    }
-
-    public double[,] GetWeightedNormalizedMatrix(double[,] normalizedMatrix, double[] weights)
-    {
-        int m = normalizedMatrix.GetLength(0);
-        int n = normalizedMatrix.GetLength(1);
-
-        double[,] resMatrix = new double[m, n];
-        
-        for (int i = 0; i < m; i++)
-        {
-            for (int j = 0; j < n; j++)
-            {
-                resMatrix[i, j] = normalizedMatrix[i, j] * weights[j];
-            }
-        }
-
-        return resMatrix;
+        return decisionMatrix.ApplyVectorNormalization();
     }
 
     public Ideals GetIdealSolutions(double[,] decisionMatrix)
@@ -137,35 +100,16 @@ public class TopsisRankingService(ILogger<TopsisRankingService> logger): IRankin
 
         return distances;
     }
-
-    public double[] GetRelativeClosenessToIdeal(IdealDistances[] distances)
+    
+    // calculated as closeness factors (relative distance)
+    public double[] GetTopsisPerformances(IdealDistances[] distances)
     {
-        var closenessFactors = new double [distances.Length];
+        var performances = new double [distances.Length];
         for (int i = 0; i < distances.Length; i++)
         {
-            closenessFactors[i] = distances[i].AntiIdealDistance / (distances[i].AntiIdealDistance + distances[i].IdealDistance);
+            performances[i] = distances[i].AntiIdealDistance / (distances[i].AntiIdealDistance + distances[i].IdealDistance);
         }
 
-        return closenessFactors;
-    }
-
-    public RankingResultDto MapCandidatesToResults(double[] closenessFactors, List<CandidateDto> candidates)
-    {
-        var result = new RankingResultDto(new List<CandidateResult>());
-        
-        if (closenessFactors.Length != candidates.Count)
-        {
-            throw new InvalidOperationException("Closeness factors count must equal candidate count");
-        }
-        
-        for(int i = 0; i < candidates.Count; i++)
-        {
-            result.Rankings.Add(new CandidateResult(Candidate: candidates[i], RankingVal: closenessFactors[i]));
-        }
-        
-        // TODO: check for identicals (lexical sorting) 
-        
-        var sorted = MHelpers.SortResults(result);
-        return sorted;
+        return performances;
     }
 }

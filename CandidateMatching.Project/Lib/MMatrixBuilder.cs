@@ -1,6 +1,6 @@
 using CandidateMatching.Domain;
 
-namespace CandidateMatching.Utils;
+namespace CandidateMatching.Lib;
 
 // TODO: add logger
 public class MMatrixBuilder()

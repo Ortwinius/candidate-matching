@@ -1,10 +1,9 @@
 using CandidateMatching.Domain;
 using CandidateMatching.Services;
-using CandidateMatching.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<IRankingService, TopsisRankingService>();
+builder.Services.AddScoped<IRankingService, WsmRankingService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -56,8 +55,8 @@ var candidates = new List<CandidateDto>
 {
     new() { Name = "Bob", CriteriaVals = [35, 90, 80, 40] },
     new() { Name = "Anna", CriteriaVals = [90, 15, 75, 30] },
-    new() { Name = "Karl", CriteriaVals = [85, 40, 94, 70] },
-    new() { Name = "Johanna", CriteriaVals = [75, 69, 45, 80] },
+    new() { Name = "Karl", CriteriaVals = [85, 10, 95, 70] },
+    new() { Name = "Johanna", CriteriaVals = [95, 70, 45, 80] },
     new() { Name = "Mohammed", CriteriaVals = [10, 90, 70, 85] },
 };
 

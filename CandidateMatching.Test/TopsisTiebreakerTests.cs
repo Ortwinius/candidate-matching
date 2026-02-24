@@ -1,6 +1,6 @@
 using CandidateMatching.Services;
 using CandidateMatching.Test.Helpers;
-using CandidateMatching.Utils;
+using CandidateMatching.Lib;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace CandidateMatching.Test;

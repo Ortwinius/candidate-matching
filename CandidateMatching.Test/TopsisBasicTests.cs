@@ -1,7 +1,7 @@
 ﻿using CandidateMatching.Domain;
+using CandidateMatching.Lib;
 using CandidateMatching.Services;
 using CandidateMatching.Test.Helpers;
-using CandidateMatching.Utils;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 
