@@ -35,7 +35,7 @@ public class TopsisRankingService(ILogger<TopsisRankingService> logger): Ranking
         var closenessFactors = GetTopsisPerformances(distances);
         var ranking = MapCandidatesToResults(closenessFactors, candidates);
         
-        // MDebug.PrintMatrix(weightedNormalized, label: "Normalized (without weights)", candidates: candidates);
+        // MDebug.PrintMatrix(normalized, label: "Normalized (without weights)", candidates: candidates);
         // MDebug.PrintMatrix(weightedNormalized, label: "Weighted Normalized", candidates: candidates);
         // MDebug.PrintVector(ideals.Ideal, label: "Best Possible (A*)");
         // MDebug.PrintVector(ideals.AntiIdeal, label: "Worst Possible (A-)"); 

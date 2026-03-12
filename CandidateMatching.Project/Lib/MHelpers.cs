@@ -13,16 +13,17 @@ public static class MHelpers
             int n = matrix.GetLength(1);
 
             double[,] resMatrix = new double[m,n];
-        
-            for (int i = 0; i < m; i++)
+
+            for (int j = 0; j < n; j++)
             {
-                for (int j = 0; j < n; j++)
+                double columnSum = 0;
+                for (int i = 0; i < m; i++)
                 {
-                    double columnSum = 0;
-                    for (int k = 0; k < m; k++)
-                    {
-                        columnSum += Math.Pow(matrix[k, j], 2);
-                    }
+                    columnSum += Math.Pow(matrix[i, j], 2);
+                }
+
+                for (int i = 0; i < m; i++)
+                {
                     resMatrix[i, j] = matrix[i, j] / Math.Sqrt(columnSum);
                 }
             }

@@ -6,7 +6,7 @@ namespace CandidateMatching.Lib;
 public class MMatrixBuilder()
 {
     private int Cols { get; set; } = 0;
-    private readonly List<List<int>> _matrixSkeleton = new List<List<int>>();
+    private readonly List<List<int>> _matrixSkeleton = [];
 
     public void AddRows(List<CandidateDto> candidates)
     {
@@ -19,7 +19,7 @@ public class MMatrixBuilder()
     {
         if (Cols == 0) Cols = candidate.CriteriaVals.Count;
         
-        if (candidate.CriteriaVals?.Count != Cols)
+        if (candidate.CriteriaVals.Count != Cols)
         {
             Console.WriteLine($"Error: Candidate criteria amount does not match Matrix columns");
             return;

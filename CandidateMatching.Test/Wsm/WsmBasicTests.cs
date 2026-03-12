@@ -1,24 +1,22 @@
-﻿using CandidateMatching.Domain;
+using CandidateMatching.Domain;
 using CandidateMatching.Lib;
 using CandidateMatching.Services;
-using CandidateMatching.Test.Helpers;
 using Microsoft.Extensions.Logging.Abstractions;
-using NUnit.Framework;
 
-namespace CandidateMatching.Test;
+namespace CandidateMatching.Test.Wsm;
 
 [TestFixture]
-public class Tests
+public class WsmBasicTests
 {
-    private IRankingService _topsisService;
+    private IRankingService _wsmService;
     private List<CandidateDto> _candidates = new List<CandidateDto>();
     private double[] _weights = [];
     
     [SetUp]
     public void Setup()
     {
-        var logger = new NullLogger<TopsisRankingService>();
-        _topsisService = new TopsisRankingService(logger);
+        var logger = new NullLogger<WsmRankingService>();
+        _wsmService = new WsmRankingService(logger);
     }
 
     [Test]
@@ -29,14 +27,14 @@ public class Tests
         {
             new() { Name = "Bob", CriteriaVals = [35, 90, 80, 40] },
             new() { Name = "Anna", CriteriaVals = [90, 15, 75, 30] },
-            new() { Name = "Karl", CriteriaVals = [85, 40, 94, 70] },
-            new() { Name = "Johanna", CriteriaVals = [75, 69, 45, 80] },
+            new() { Name = "Karl", CriteriaVals = [85, 10, 95, 70] },
+            new() { Name = "Johanna", CriteriaVals = [95, 70, 45, 80] },
             new() { Name = "Mohammed", CriteriaVals = [10, 90, 70, 85] },
         };
 
         var weights = new double[] { 0.3, 0.2, 0.2, 0.3 };  
         // Act
-        var result = _topsisService.PerformRanking(candidates: candidates, weights: weights);
+        var result = _wsmService.PerformRanking(candidates: candidates, weights: weights);
         
         // Assert
         Assert.That(result.Rankings.Count, Is.EqualTo(5));
@@ -49,21 +47,23 @@ public class Tests
         // Arrange
         var candidates = new List<CandidateDto>
         {
-            new() { Name = "Elena", CriteriaVals = [15, 40, 25, 40] },
-            new() { Name = "Marcus", CriteriaVals = [20, 30, 20, 35] },
-            new() { Name = "Sasha", CriteriaVals = [30, 10, 30, 15] }
+            new() { Name = "Bob", CriteriaVals = [35, 90, 80, 40] },
+            new() { Name = "Anna", CriteriaVals = [90, 15, 75, 30] },
+            new() { Name = "Karl", CriteriaVals = [85, 10, 95, 70] },
+            new() { Name = "Johanna", CriteriaVals = [95, 70, 45, 80] },
+            new() { Name = "Mohammed", CriteriaVals = [10, 90, 70, 85] },
         };
+
+        var weights = new double[] { 0.3, 0.2, 0.2, 0.3 };  
         
-        var weights = new double[4] { 0.3, 0.1, 0.4, 0.2 };
-        
-        var correctRelativeClosenessToIdealSolution = new double[] { 0.576, 0.486, 0.427 };
+        var correctRelativeClosenessToIdealSolution = new double[] { 0.833, 0.738, 0.679, 0.62, 0.581 };
         // Act
-        var result = _topsisService.PerformRanking(candidates: candidates, weights: weights);
+        var result = _wsmService.PerformRanking(candidates: candidates, weights: weights);
 
         var roundedClosenessFactors = MHelpers.RoundRankingValues(result);
         
         // Assert
-        Assert.That(result.Rankings.Count, Is.EqualTo(3));
+        Assert.That(result.Rankings.Count, Is.EqualTo(5));
         Assert.That(roundedClosenessFactors, Is.EqualTo(correctRelativeClosenessToIdealSolution));
     }
 }

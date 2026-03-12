@@ -6,14 +6,14 @@ namespace CandidateMatching.Test.Helpers;
 public static class CandidateFactory
 {
     private static readonly Random RndGen = new Random(Guid.NewGuid().GetHashCode());
-    private const int Range = 100;
+    private const int CriteriaValueRange = 100;
     
     public static CandidateDto CreateCandidate(int criteriaAmount)
     {
         var criteriaVals = new List<int>();
         for (int i = 0; i < criteriaAmount; i++)
         {
-            var randomValue = (RndGen.Next() % Range) + 1;
+            var randomValue = (RndGen.Next() % CriteriaValueRange) + 1;
             criteriaVals.Add(randomValue);
         }
         var name = GenerateUniqueName();

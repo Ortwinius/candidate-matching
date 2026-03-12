@@ -1,0 +1,53 @@
+sequenceDiagram
+    autonumber
+    participant U as System/User
+
+    box rgb(10,10,10) API
+        participant C as RankingController
+    end
+
+    box rgb(30,30,20) Services
+        participant S as TopsisRankingService
+    end
+
+    box rgb(21, 21, 12) Library
+        participant L as MHelpers (Extensions)
+        participant B as MMatrixBuilder
+    end
+%%    participant D as Domain Models
+
+    U->>C: POST /rank (candidates, weights)
+    activate C
+    C->>S: PerformRanking(candidates, weights)
+    activate S
+
+%%    Note over S: Validation: Weights sum to 1.0
+
+    S->>B: AddRows(candidates)
+    S->>B: Build()
+    activate B
+    B-->>S: double[,] decisionMatrix
+    deactivate B
+
+    rect rgb(51, 41, 42)
+        Note right of S: MCDM Core Process
+        S->>L: ApplyVectorNormalization(matrix)
+        L-->>S: normalizedMatrix
+        S->>L: ApplyWeights(norm, weights)
+        L-->>S: weightedNormalizedMatrix
+    end
+
+    S->>S: Calculate Ideals & Distances
+    S->>S: Calculate Closeness Factors
+
+    S->>L: MapCandidatesToResults(performances)
+
+    L-->>S: RankingResultDto (unsorted)
+
+    S->>L: SortResults(ranking)
+    L-->>S: RankingResultDto (sorted)
+
+    S-->>C: Final Ranking Result
+    deactivate S
+    C-->>U: JSON Response (200 OK)
+    deactivate C

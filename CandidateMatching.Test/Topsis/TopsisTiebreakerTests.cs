@@ -1,9 +1,9 @@
+using CandidateMatching.Lib;
 using CandidateMatching.Services;
 using CandidateMatching.Test.Helpers;
-using CandidateMatching.Lib;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace CandidateMatching.Test;
+namespace CandidateMatching.Test.Topsis;
 
 [TestFixture]
 public class TopsisTiebreakerTests
@@ -44,17 +44,16 @@ public class TopsisTiebreakerTests
                 if (Math.Abs(prev - current) < 1e-9)
                 {
                     tiebreakerCount++;
-                    Console.WriteLine($"[!] Tie Breaker in Iteration {i + 1}:");
-                    Console.WriteLine($"    Affected No1: {ranking.Rankings[j - 1].Candidate.Name} ({ranking.Rankings[j - 1].RankingVal:F4})");
-                    Console.WriteLine($"    Affected No2:    {ranking.Rankings[j].Candidate.Name} ({ranking.Rankings[j].RankingVal:F4})");
-                    Console.WriteLine("--------------------------------------------------");
+                    // Console.WriteLine($"[!] Tie Breaker in Iteration {i + 1}:");
+                    // Console.WriteLine($"    Affected No1: {ranking.Rankings[j - 1].Candidate.Name} ({ranking.Rankings[j - 1].RankingVal:F4})");
+                    // Console.WriteLine($"    Affected No2:    {ranking.Rankings[j].Candidate.Name} ({ranking.Rankings[j].RankingVal:F4})");
                 }
             }
         }
         double percentage = (double)tiebreakerCount / iterations * 100;
-        Console.WriteLine($"--- STATISTICS ---");
+
         Console.WriteLine($"Total Runs: {iterations}");
-        Console.WriteLine($"Rank Reversals: {tiebreakerCount}");
+        Console.WriteLine($"Tie Breakers: {tiebreakerCount}");
         Console.WriteLine($"Probability: {percentage}%");
     }
 }

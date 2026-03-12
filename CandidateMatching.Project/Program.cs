@@ -3,7 +3,7 @@ using CandidateMatching.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<IRankingService, WsmRankingService>();
+builder.Services.AddScoped<IRankingService, TopsisRankingService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
