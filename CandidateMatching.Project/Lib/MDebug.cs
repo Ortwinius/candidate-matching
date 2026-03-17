@@ -74,4 +74,16 @@ public static class MDebug
             Console.WriteLine($"{i+1}.: {current.Candidate.Name} - Score: {current.RankingVal.ToString(format)}");
         }
     }
+
+    // TODO: also print weight name after Refactor of weights
+    public static void PrintWeights(double[] weights)
+    {
+        Console.WriteLine("[ ");
+        foreach (var weight in weights)
+        {
+            Console.WriteLine(weight + " ");
+        }
+
+        Console.WriteLine("]");
+    }
 }

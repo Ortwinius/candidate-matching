@@ -1,6 +1,6 @@
-using CandidateMatching.Application.Services;
+using CandidateMatching.Application.Benchmark;
+using CandidateMatching.Application.Ranking;
 using CandidateMatching.Domain;
-using CandidateMatching.Test.Helpers;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace CandidateMatching.Test.Topsis;

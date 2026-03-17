@@ -1,9 +1,11 @@
-using CandidateMatching.Application.Services;
+using CandidateMatching.Application.Benchmark;
+using CandidateMatching.Application.Ranking;
 using CandidateMatching.Domain;
+using Microsoft.Extensions.Logging.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<IRankingService, TopsisRankingService>();
+// builder.Services.AddScoped<IRankingService, TopsisRankingService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -63,7 +65,18 @@ var candidates = new List<CandidateDto>
 var weights = new double[] { 0.3, 0.2, 0.2, 0.3 };  
 
 using var scope = app.Services.CreateScope();
-var rankingService = scope.ServiceProvider.GetRequiredService<IRankingService>();
-var ranking = rankingService.PerformRanking(candidates, weights);
+// var rankingService = scope.ServiceProvider.GetRequiredService<IRankingService>();
+
+var topsisLogger = new NullLogger<TopsisRankingService>();
+var wsmLogger = new NullLogger<WsmRankingService>();
+var topsisRankingService = new TopsisRankingService(topsisLogger);
+var wsmRankingService = new WsmRankingService(wsmLogger);
+
+var benchmark = new BenchmarkRunner<TopsisRankingService, WsmRankingService>(topsisRankingService, wsmRankingService);
+
+benchmark.RunBenchmark(iterations: 2, candidateAmount: 5);
+
+// var ranking = rankingService.PerformRanking(candidates, weights);
+
 
 app.Run();

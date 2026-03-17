@@ -1,4 +1,4 @@
-using CandidateMatching.Application.Services;
+using CandidateMatching.Application.Ranking;
 using CandidateMatching.Domain;
 using CandidateMatching.Lib;
 using Microsoft.Extensions.Logging.Abstractions;

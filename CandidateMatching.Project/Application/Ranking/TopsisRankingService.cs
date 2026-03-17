@@ -1,7 +1,7 @@
 using CandidateMatching.Domain;
 using CandidateMatching.Lib;
 
-namespace CandidateMatching.Application.Services;
+namespace CandidateMatching.Application.Ranking;
 
 // Topsis Implementation of Ranking
 public class TopsisRankingService(ILogger<TopsisRankingService> logger): RankingService
@@ -31,13 +31,13 @@ public class TopsisRankingService(ILogger<TopsisRankingService> logger): Ranking
         var closenessFactors = GetTopsisPerformances(distances);
         var ranking = MapCandidatesToResults(closenessFactors, candidates);
         
-        // MDebug.PrintMatrix(normalized, label: "Normalized (without weights)", candidates: candidates);
-        // MDebug.PrintMatrix(weightedNormalized, label: "Weighted Normalized", candidates: candidates);
-        // MDebug.PrintVector(ideals.Ideal, label: "Best Possible (A*)");
-        // MDebug.PrintVector(ideals.AntiIdeal, label: "Worst Possible (A-)"); 
-        // MDebug.PrintIdealDistances(distances, candidates: candidates);
-        // MDebug.PrintVector(closenessFactors, label:"Closeness Factors (Results)");
-        // MDebug.PrintRanking(ranking);
+        MDebug.PrintMatrix(normalized, label: "Normalized (without weights)", candidates: candidates);
+        MDebug.PrintMatrix(weightedNormalized, label: "Weighted Normalized", candidates: candidates);
+        MDebug.PrintVector(ideals.Ideal, label: "Best Possible (A*)");
+        MDebug.PrintVector(ideals.AntiIdeal, label: "Worst Possible (A-)"); 
+        MDebug.PrintIdealDistances(distances, candidates: candidates);
+        MDebug.PrintVector(closenessFactors, label:"Closeness Factors (Results)");
+        MDebug.PrintRanking(ranking);
         
         return ranking;
     }

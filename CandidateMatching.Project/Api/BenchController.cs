@@ -1,3 +1,4 @@
+using CandidateMatching.Application.Benchmark;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CandidateMatching.Api;
@@ -12,6 +13,8 @@ public class BenchController(
     public IActionResult Get()
     {
         // logger.Log(LogLevel.Information, $"Starting benchmark");
+        int candidates = 25;
+        int criteria = 5;
         return Ok("");
     }
 }

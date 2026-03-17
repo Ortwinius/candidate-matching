@@ -1,7 +1,7 @@
 using CandidateMatching.Domain;
 using CandidateMatching.Lib;
 
-namespace CandidateMatching.Application.Services;
+namespace CandidateMatching.Application.Ranking;
 
 public class WsmRankingService(ILogger<WsmRankingService> logger) : RankingService
 {
@@ -29,10 +29,10 @@ public class WsmRankingService(ILogger<WsmRankingService> logger) : RankingServi
         var performances = GetWsmPerformances(weightedNormalized);
         var ranking = MapCandidatesToResults(performances, candidates);
         
-        // MDebug.PrintMatrix(normalized, label: "Normalized (without weights)", candidates: candidates);
-        // MDebug.PrintMatrix(weightedNormalized, label: "Weighted Normalized", candidates: candidates);
-        // MDebug.PrintVector(performances, label:"Performances (Results)");
-        // MDebug.PrintRanking(ranking);
+        MDebug.PrintMatrix(normalized, label: "Normalized (without weights)", candidates: candidates);
+        MDebug.PrintMatrix(weightedNormalized, label: "Weighted Normalized", candidates: candidates);
+        MDebug.PrintVector(performances, label:"Performances (Results)");
+        MDebug.PrintRanking(ranking);
         
         return ranking;
     }

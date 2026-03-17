@@ -1,8 +1,6 @@
-using CandidateMatching.Application;
 using CandidateMatching.Domain;
-using CandidateMatching.Lib;
 
-namespace CandidateMatching.Test.Helpers;
+namespace CandidateMatching.Application.Benchmark;
 
 public static class CandidateFactory
 {
