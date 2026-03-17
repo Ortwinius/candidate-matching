@@ -1,4 +1,4 @@
-using CandidateMatching.Services;
+using CandidateMatching.Application.Services;
 using CandidateMatching.Test.Helpers;
 using Microsoft.Extensions.Logging.Abstractions;
 

@@ -1,11 +1,7 @@
-using System.ComponentModel.DataAnnotations;
-using System.Data;
-using System.Net.WebSockets;
-using System.Reflection.Emit;
 using CandidateMatching.Domain;
 using CandidateMatching.Lib;
 
-namespace CandidateMatching.Services;
+namespace CandidateMatching.Application.Services;
 
 // Topsis Implementation of Ranking
 public class TopsisRankingService(ILogger<TopsisRankingService> logger): RankingService
@@ -24,7 +20,7 @@ public class TopsisRankingService(ILogger<TopsisRankingService> logger): Ranking
             throw new InvalidOperationException("Sum of weights must equal 1");
         }
         
-        var matrixBuilder = new MMatrixBuilder();
+        var matrixBuilder = new MatrixBuilder();
         matrixBuilder.AddRows(candidates);
         var matrix = matrixBuilder.Build();
             

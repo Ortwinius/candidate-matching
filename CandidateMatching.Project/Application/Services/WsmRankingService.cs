@@ -1,7 +1,7 @@
 using CandidateMatching.Domain;
 using CandidateMatching.Lib;
 
-namespace CandidateMatching.Services;
+namespace CandidateMatching.Application.Services;
 
 public class WsmRankingService(ILogger<WsmRankingService> logger) : RankingService
 {
@@ -19,7 +19,7 @@ public class WsmRankingService(ILogger<WsmRankingService> logger) : RankingServi
             throw new InvalidOperationException("Sum of weights must equal 1");
         }
         
-        var matrixBuilder = new MMatrixBuilder();
+        var matrixBuilder = new MatrixBuilder();
         matrixBuilder.AddRows(candidates);
         var matrix = matrixBuilder.Build();
             

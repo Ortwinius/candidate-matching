@@ -1,5 +1,5 @@
+using CandidateMatching.Application.Services;
 using CandidateMatching.Domain;
-using CandidateMatching.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

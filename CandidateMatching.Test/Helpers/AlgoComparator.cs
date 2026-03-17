@@ -1,7 +1,7 @@
 using System.Runtime.ExceptionServices;
+using CandidateMatching.Application;
 using CandidateMatching.Domain;
 using CandidateMatching.Lib;
-using CandidateMatching.Services;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 namespace CandidateMatching.Test.Helpers;

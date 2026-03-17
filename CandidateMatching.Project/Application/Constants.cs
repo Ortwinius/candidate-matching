@@ -1,4 +1,4 @@
-namespace CandidateMatching.Lib;
+namespace CandidateMatching.Application;
 
 public static class MConstants
 {
