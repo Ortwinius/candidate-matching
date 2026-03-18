@@ -30,6 +30,13 @@ public sealed record BenchmarkContext(
     // WsmRankingService? AlternativeRankingService
 );
 
+public sealed record Criteria(
+    double Competence,
+    double SoftAvailability,
+    double Experience,
+    double DistanceWithinRegion,
+    double KnowsCompany);
+
 public sealed record PairMetric(
     string Key,
     Func<BenchmarkContext, double> Calculate
