@@ -7,7 +7,6 @@ namespace CandidateMatching.Lib;
 public static class MHelpers
 {
 
-
     public static RankingResultDto SortResults(RankingResultDto ranking)
     {
         var res = ranking.Rankings.OrderByDescending(x => x.RankingVal).ToList();

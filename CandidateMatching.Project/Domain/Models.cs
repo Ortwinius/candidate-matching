@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using CandidateMatching.Application.Benchmark;
+using CandidateMatching.Application.Ranking;
 
 namespace CandidateMatching.Domain;
 
@@ -24,9 +25,9 @@ public sealed record RankingResultsPair(RankingResultDto TopsisResult, RankingRe
 public sealed record BenchmarkContext(
     List<CandidateDto> Candidates,
     double[] Weights,
-    RankingResultsPair Results,
-    IRankingService RankingService,
-    IRankingService? AlternativeRankingService
+    RankingResultsPair Results
+    // TopsisRankingService? RankingService,
+    // WsmRankingService? AlternativeRankingService
 );
 
 public sealed record PairMetric(
@@ -36,5 +37,5 @@ public sealed record PairMetric(
 
 public sealed record SingleMetric(
     string Key,
-    Func<BenchmarkContext, RankingResultDto, double> Calculate
+    Func<BenchmarkContext, RankingResultDto, IRankingService, double> Calculate
 );

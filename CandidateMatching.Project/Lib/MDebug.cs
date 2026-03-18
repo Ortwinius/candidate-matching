@@ -86,4 +86,10 @@ public static class MDebug
 
         Console.WriteLine("]");
     }
+
+    // public static void PrintCandidateNames(CandidateDto candidates)
+    // {
+    //     Console.WriteLine("Candidates: ");
+    //      
+    // }
 }

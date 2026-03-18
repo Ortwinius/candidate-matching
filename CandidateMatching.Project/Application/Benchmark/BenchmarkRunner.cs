@@ -38,9 +38,7 @@ public class BenchmarkRunner<TA, TB>(TA topsis, TB wsm)
             var ctx = new BenchmarkContext(
                 Candidates: candidates,
                 Weights: weights,
-                Results: results,
-                RankingService: topsis,
-                AlternativeRankingService: wsm
+                Results: results
             );
 
             // aggregating pairmetrics to a total score
@@ -52,8 +50,8 @@ public class BenchmarkRunner<TA, TB>(TA topsis, TB wsm)
             // aggregating singlemetrics to a total score
             foreach (var metric in _singleMetrics)
             {
-                topsisTotals[metric.Key] += metric.Calculate(ctx, results.TopsisResult);
-                wsmTotals[metric.Key] += metric.Calculate(ctx, results.WsmResult);
+                topsisTotals[metric.Key] += metric.Calculate(ctx, results.TopsisResult, topsis);
+                wsmTotals[metric.Key] += metric.Calculate(ctx, results.WsmResult, wsm);
             }
         }
 
@@ -73,22 +71,22 @@ public class BenchmarkRunner<TA, TB>(TA topsis, TB wsm)
         Dictionary<string, double> topsisTotals,
         Dictionary<string, double> wsmTotals)
     {
-        Console.WriteLine("=== Pair Metrics ===");
+        Console.WriteLine("\n=== Pair Metrics ===");
         foreach (var kv in pairTotals)
         {
-            Console.WriteLine($"{kv.Key}: {kv.Value} / {iterations}");
+            Console.WriteLine($"{kv.Key}: {kv.Value} / {iterations}({kv.Value / iterations * 100:F2}%)");
         }
 
-        Console.WriteLine("\n=== Single Metrics: First ===");
+        Console.WriteLine("\n=== Single Metrics: TOPSIS ===");
         foreach (var kv in topsisTotals)
         {
-            Console.WriteLine($"{kv.Key}: {kv.Value} / {iterations}");
+            Console.WriteLine($"{kv.Key}: {kv.Value} / {iterations} ({kv.Value / iterations * 100:F2}%)");
         }
 
-        Console.WriteLine("\n=== Single Metrics: Second ===");
+        Console.WriteLine("\n=== Single Metrics: WSM ===");
         foreach (var kv in wsmTotals)
         {
-            Console.WriteLine($"{kv.Key}: {kv.Value} / {iterations}");
+            Console.WriteLine($"{kv.Key}: {kv.Value} / {iterations} ({kv.Value / iterations * 100:F2}%)");
         }
     }
 }

@@ -14,8 +14,10 @@ public static class MetricRegistry
     public static readonly List<SingleMetric> SingleMetrics =
     [
         new("tiebreaker", BenchMetrics.TiebreakerMetric),
-        new("rank_reversal", BenchMetrics.RankReversalMetric),
-        new("weight_sensitivity", BenchMetrics.WeightSensitivityMetric)
+        new("winner_margin", BenchMetrics.WinnerMarginMetric),
+        new("top_1_rank_reversal", BenchMetrics.Top1RankReversalMetric),
+        new("total_rank_reversal", BenchMetrics.TotalRankReversalMetric),
+        new("weight_sensitivity", BenchMetrics.Top1WeightSensitivityMetric)
     ];
 }
 
@@ -45,75 +47,152 @@ public static class StatisticMetrics
 // Used for single algorithms, has to be run for each algo independently if they should be compared 
 public static class BenchMetrics
 {
+    // checks if there is at least one tiebreaker in an iteration
     public static double TiebreakerMetric(
         BenchmarkContext ctx,
-        RankingResultDto originalRanking
+        RankingResultDto originalRanking,
+        IRankingService rankingService
         )
     {
         int candidateCount = originalRanking.Rankings.Count;
-        int tiebreakerCount = 0;
-
-        var roundedRankingData = MHelpers.RoundRankingValues(originalRanking);
+        int precision = 3;
+        var roundedRankingData = MHelpers.RoundRankingValues(originalRanking, precision: precision);
         
-        for (int j = 1; j < candidateCount; j++)
+        for (int i = 1; i < candidateCount; i++)
         {
-            var prev = roundedRankingData[j - 1];
-            var current = roundedRankingData[j];
+            var prev = roundedRankingData[i - 1];
+            var current = roundedRankingData[i];
     
-            if (Math.Abs(prev - current) < 1e-9)
+            if (Math.Abs(prev - current) < 1e-3)
             {
-                tiebreakerCount++;
-                Console.WriteLine($"[!] Tie Breaker in Iteration {j + 1}:");
-                Console.WriteLine($"    Affected No1: {originalRanking.Rankings[j - 1].Candidate.Name} ({originalRanking.Rankings[j - 1].RankingVal:F4})");
-                Console.WriteLine($"    Affected No2:    {originalRanking.Rankings[j].Candidate.Name} ({originalRanking.Rankings[j].RankingVal:F4})");
+                LogMetricIncident(nameof(TiebreakerMetric), iteration: i);
+                
+                Console.WriteLine($"    Affected No1: {originalRanking.Rankings[i - 1].Candidate.Name} ({originalRanking.Rankings[i - 1].RankingVal:F4})");
+                Console.WriteLine($"    Affected No2:    {originalRanking.Rankings[i].Candidate.Name} ({originalRanking.Rankings[i].RankingVal:F4})");
+                
+                return 1d;
             }
         }
     
-        return tiebreakerCount;
+        return 0d;
     }
     
-    // TODO: check if correct
-    public static double RankReversalMetric(
+    public static double WinnerMarginMetric(
         BenchmarkContext ctx,
-        RankingResultDto originalRanking)
+        RankingResultDto ranking,
+        IRankingService rankingService
+    )
+    {
+        double defaultMargin = 0.05;
+        var top1Score = ranking.Rankings[0].RankingVal;
+        var top2Score = ranking.Rankings[1].RankingVal;
+
+        if (Math.Abs(top2Score - top1Score) < defaultMargin)
+        {
+            LogMetricIncident(nameof(WinnerMarginMetric));
+            return 1d;
+        }
+
+        return 0d;
+    }
+    
+    public static double Top1RankReversalMetric(
+        BenchmarkContext ctx,
+        RankingResultDto initialRanking,
+        IRankingService rankingService
+        )
     {
         if (ctx.Candidates.Count < 2)
             return 0d;
 
-        var reducedCandidates = ctx.Candidates.Remove(ctx.Candidates.Last());
-        // var rerun = 
+        var initialWorstCandidate = initialRanking.Rankings.Last().Candidate;
+            
+        var reducedCandidates = ctx.Candidates.Where(c => c.Name != initialWorstCandidate.Name).ToList();
+        
+        var rerun = rankingService.PerformRanking(reducedCandidates, ctx.Weights);
+        
+        if (rerun.Rankings.First().Candidate.Name != initialRanking.Rankings.First().Candidate.Name)
+        {
+            LogMetricIncident(nameof(Top1RankReversalMetric));
+            // MDebug.PrintRanking(initialRanking, label: "Original Ranking");
+            // MDebug.PrintRanking(rerun, label: $"Ranking without worst candidate {initialWorstCandidate.Name} with RR:");
+            // LogReversalDetails(initial: originalRanking, reduced: rerun);
+            return 1d;
+        }
 
-        // var reducedCandidates = ctx.Candidates.Skip(1).ToList(); 
-        // var rerun = ctx.RankingService.PerformRanking(reducedCandidates, ctx.Weights);
-        //
-        // var originalTop = originalRanking.Rankings
-        //     .Select(x => x.Candidate.Name)
-        //     .Where(name => reducedCandidates.Any(c => c.Name == name))
-        //     .ToList();
-        //
-        // var rerunTop = rerun.Rankings
-        //     .Select(x => x.Candidate.Name)
-        //     .ToList();
-        //
-        // return originalTop.SequenceEqual(rerunTop) ? 0d : 1d;
-
+        return 0d;
 
     }
-   
-    // TODO: check if correct
-    public static double WeightSensitivityMetric(
+    
+
+    // checks if any position changed, not just the top 1 (naturally much more likely to happen)
+    public static double TotalRankReversalMetric(
         BenchmarkContext ctx,
-        RankingResultDto originalRanking)
+        RankingResultDto initialRanking,
+        IRankingService rankingService
+    )
+    {
+        if (ctx.Candidates.Count < 2)
+            return 0d;
+
+        var initialWorstCandidate = initialRanking.Rankings.Last().Candidate;
+            
+        var reducedCandidates = ctx.Candidates.Where(c => c.Name != initialWorstCandidate.Name).ToList();
+        
+        var rerun = rankingService.PerformRanking(reducedCandidates, ctx.Weights);
+        
+        var originalNamesMinusWorst = initialRanking.Rankings
+            .Select(x => x.Candidate.Name)
+            .Where(name => reducedCandidates.Any(c => c.Name == name))
+            .ToList();
+        
+        var rerunNames = rerun.Rankings
+            .Select(x => x.Candidate.Name)
+            .ToList();
+
+        if (!originalNamesMinusWorst.SequenceEqual(rerunNames))
+        {
+            LogMetricIncident(nameof(TotalRankReversalMetric));
+            // MDebug.PrintRanking(initialRanking, label: "Original Ranking");
+            // MDebug.PrintRanking(rerun, label: $"Ranking without worst candidate {initialWorstCandidate.Name} with RR:");
+            return 1d;
+        }
+
+        return 0d;
+    }
+    
+
+    // Plan: biggest weight is reduced by 5%. Then it checks if top 1 changed
+    public static double Top1WeightSensitivityMetric(
+        BenchmarkContext ctx,
+        RankingResultDto originalRanking,
+        IRankingService rankingService
+        )
     {
         var modifiedWeights = (double[])ctx.Weights.Clone();
-        modifiedWeights[0] += 0.05;
-        modifiedWeights[1] -= 0.05;
+        
+        int maxIndex = Array.IndexOf(modifiedWeights, modifiedWeights.Max());
+         
+        modifiedWeights[maxIndex] -= 0.05;
+        var normalizedModifiedWeights = Normalizer.NormalizeWeights(modifiedWeights);
 
-        var rerun = ctx.RankingService.PerformRanking(ctx.Candidates, modifiedWeights);
+        var rerun = rankingService.PerformRanking(ctx.Candidates, normalizedModifiedWeights);
 
         var originalTop1 = originalRanking.Rankings.First().Candidate.Name;
         var newTop1 = rerun.Rankings.First().Candidate.Name;
 
-        return originalTop1 == newTop1 ? 0d : 1d;
+        // return originalTop1 == newTop1 ? 0d : 1d;
+        if (originalTop1 != newTop1)
+        {
+            LogMetricIncident(nameof(Top1WeightSensitivityMetric));
+            return 1d;
+        }
+
+        return 0d;
+    }
+   
+    private static void LogMetricIncident(string metricType, int? iteration = null, RankingResultDto? original = null, RankingResultDto? mutated = null)
+    {
+        Console.WriteLine($"[!] {metricType}-incident occurred {(iteration != null ? $" in iteration {iteration}" : "")}");
     }
 }

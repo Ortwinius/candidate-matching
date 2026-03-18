@@ -124,4 +124,16 @@ public static class Normalizer
             return resMatrix;
         }
     }
+    
+    public static double[] NormalizeWeights(IEnumerable<double> weights)
+    {
+        var list = weights.ToList();
+        double sum = list.Sum();
+
+        if (Math.Abs(sum) < 1e-12)
+            throw new InvalidOperationException("Sum of weights is zero — cannot normalize.");
+
+        return list.Select(w => w / sum).ToArray();
+    }
+    
 }
