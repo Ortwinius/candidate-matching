@@ -72,7 +72,7 @@ var wsmLogger = new NullLogger<WsmRankingService>();
 var topsisRankingService = new TopsisRankingService(topsisLogger);
 var wsmRankingService = new WsmRankingService(wsmLogger);
 
-var benchmark = new BenchmarkRunner<TopsisRankingService, WsmRankingService>(topsisRankingService, wsmRankingService);
+var benchmark = new MetricTestRunner<TopsisRankingService, WsmRankingService>(topsisRankingService, wsmRankingService);
 
 benchmark.RunBenchmark(iterations: 100000, candidateAmount: 25);
 

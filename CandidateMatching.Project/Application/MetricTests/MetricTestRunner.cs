@@ -12,7 +12,7 @@ namespace CandidateMatching.Application.Benchmark;
 //     public RankingResultsPair GetRankingResults(List<CandidateDto> candidates, double[] weights);
 // }
 
-public class BenchmarkRunner<TA, TB>(TA topsis, TB wsm)
+public class MetricTestRunner<TA, TB>(TA topsis, TB wsm)
     where TA : TopsisRankingService 
     where TB : WsmRankingService 
 {
