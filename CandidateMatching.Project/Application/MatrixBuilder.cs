@@ -2,7 +2,6 @@ using CandidateMatching.Domain;
 
 namespace CandidateMatching.Application;
 
-// TODO: add logger
 public class MatrixBuilder()
 {
     private int Cols { get; set; } = 0;

@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace CandidateMatching.Application;
 
 public static class Normalizer
@@ -24,7 +26,7 @@ public static class Normalizer
                     resMatrix[i, j] = matrix[i, j] / Math.Sqrt(columnSum);
                 }
             }
-        
+            
             return resMatrix;
         }
         

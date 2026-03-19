@@ -78,13 +78,13 @@ public static class MDebug
     // TODO: also print weight name after Refactor of weights
     public static void PrintWeights(double[] weights)
     {
-        Console.WriteLine("[ ");
+        Console.Write("[ ");
         foreach (var weight in weights)
         {
-            Console.WriteLine(weight + " ");
+            Console.Write(weight + " ");
         }
 
-        Console.WriteLine("]");
+        Console.WriteLine($"] = {weights.Length}");
     }
 
     // public static void PrintCandidateNames(CandidateDto candidates)

@@ -22,7 +22,10 @@ public class BenchmarkRunner<TA, TB>(TA topsis, TB wsm)
     public void RunBenchmark(int iterations, int? candidateAmount = null, int? criteriaAmount = null)
     {
         double[] weights = [0.3, 0.1, 0.1, 0.2, 0.3];
-
+        // double[] weights = [0.05, 0.05, 0.1, 0.05, 0.1, 0.1, 0.1, 0.08, 0.02, 0.35];
+        
+        int candidateNumber = candidateAmount ?? MConstants.DefaultCandidateAmount;
+        
         MDebug.PrintWeights(weights);
         
         // initialize all data with 0 
@@ -32,7 +35,7 @@ public class BenchmarkRunner<TA, TB>(TA topsis, TB wsm)
 
         for (int i = 0; i < iterations; i++)
         {
-            var candidates = CandidateFactory.CreateCandidateList(candidateAmount ?? MConstants.DefaultCandidateAmount);
+            var candidates = CandidateFactory.CreateCandidateList(candidateNumber, criteriaAmount: weights.Length);
             var results = GetRankingResults(candidates, weights);
 
             var ctx = new BenchmarkContext(
@@ -55,7 +58,7 @@ public class BenchmarkRunner<TA, TB>(TA topsis, TB wsm)
             }
         }
 
-        PrintResults(iterations, pairTotals, topsisTotals, wsmTotals);
+        PrintResults(iterations, weights, candidateNumber, pairTotals, topsisTotals, wsmTotals);
     }
 
     public RankingResultsPair GetRankingResults(List<CandidateDto> candidates, double[] weights)
@@ -67,10 +70,20 @@ public class BenchmarkRunner<TA, TB>(TA topsis, TB wsm)
 
     private void PrintResults(
         int iterations,
+        double[] weights, 
+        int candidateAmount,
         Dictionary<string, double> pairTotals,
         Dictionary<string, double> topsisTotals,
         Dictionary<string, double> wsmTotals)
     {
+        Console.WriteLine("\n=== RESULTS === ");
+        
+        Console.Write($"Candidate Amount: {candidateAmount}");
+        
+        Console.Write("\nWeights: ");
+        MDebug.PrintWeights(weights);
+        Console.WriteLine($"Iterations: {iterations}"); 
+        
         Console.WriteLine("\n=== Pair Metrics ===");
         foreach (var kv in pairTotals)
         {

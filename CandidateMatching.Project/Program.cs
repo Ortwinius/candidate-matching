@@ -74,7 +74,7 @@ var wsmRankingService = new WsmRankingService(wsmLogger);
 
 var benchmark = new BenchmarkRunner<TopsisRankingService, WsmRankingService>(topsisRankingService, wsmRankingService);
 
-benchmark.RunBenchmark(iterations: 1000, candidateAmount: 10);
+benchmark.RunBenchmark(iterations: 100000, candidateAmount: 25);
 
 // var ranking = rankingService.PerformRanking(candidates, weights);
 

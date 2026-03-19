@@ -55,20 +55,20 @@ public static class BenchMetrics
         )
     {
         int candidateCount = originalRanking.Rankings.Count;
-        int precision = 3;
-        var roundedRankingData = MHelpers.RoundRankingValues(originalRanking, precision: precision);
+        // int precision = 10;
+        var roundedRankingData = MHelpers.RoundRankingValues(originalRanking, precision: 15);
         
         for (int i = 1; i < candidateCount; i++)
         {
             var prev = roundedRankingData[i - 1];
             var current = roundedRankingData[i];
     
-            if (Math.Abs(prev - current) < 1e-3)
+            if (Math.Abs(prev - current) < 1e-8)
             {
                 LogMetricIncident(nameof(TiebreakerMetric), iteration: i);
                 
-                Console.WriteLine($"    Affected No1: {originalRanking.Rankings[i - 1].Candidate.Name} ({originalRanking.Rankings[i - 1].RankingVal:F4})");
-                Console.WriteLine($"    Affected No2:    {originalRanking.Rankings[i].Candidate.Name} ({originalRanking.Rankings[i].RankingVal:F4})");
+                // Console.WriteLine($"    Affected No1: {originalRanking.Rankings[i - 1].Candidate.Name} ({originalRanking.Rankings[i - 1].RankingVal:F4})");
+                // Console.WriteLine($"    Affected No2:    {originalRanking.Rankings[i].Candidate.Name} ({originalRanking.Rankings[i].RankingVal:F4})");
                 
                 return 1d;
             }
@@ -77,19 +77,24 @@ public static class BenchMetrics
         return 0d;
     }
     
+    /* Winner Margin Diff:
+     0.01 ~ 1%,0.02 ~ 3 %, 0.05 ~ 5% (25/30), 0.10 ~ 8% (60/65), 0.2 ~ 8% (75/85)
+    - Ofcourse values (not diff) represent gauß bell curve */
     public static double WinnerMarginMetric(
         BenchmarkContext ctx,
         RankingResultDto ranking,
         IRankingService rankingService
     )
     {
-        double defaultMargin = 0.05;
+        double defaultMargin = 0.005;
         var top1Score = ranking.Rankings[0].RankingVal;
         var top2Score = ranking.Rankings[1].RankingVal;
 
         if (Math.Abs(top2Score - top1Score) < defaultMargin)
         {
             LogMetricIncident(nameof(WinnerMarginMetric));
+            Console.WriteLine("1.:" + ranking.Rankings[0].RankingVal);
+            Console.WriteLine("2.:" + ranking.Rankings[1].RankingVal);
             return 1d;
         }
 
@@ -193,6 +198,6 @@ public static class BenchMetrics
    
     private static void LogMetricIncident(string metricType, int? iteration = null, RankingResultDto? original = null, RankingResultDto? mutated = null)
     {
-        Console.WriteLine($"[!] {metricType}-incident occurred {(iteration != null ? $" in iteration {iteration}" : "")}");
+        // Console.WriteLine($"[!] {metricType}-incident occurred {(iteration != null ? $" in iteration {iteration}" : "")}");
     }
 }
