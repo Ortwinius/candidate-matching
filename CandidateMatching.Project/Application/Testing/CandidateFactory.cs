@@ -1,18 +1,17 @@
 using CandidateMatching.Domain;
 
-namespace CandidateMatching.Application.Benchmark;
+namespace CandidateMatching.Application.Testing;
 
 public static class CandidateFactory
 {
     private static readonly Random RndGen = new Random(Guid.NewGuid().GetHashCode());
-    private const int CriteriaValueRange = 100;
     
     public static CandidateDto CreateCandidate(int criteriaAmount)
     {
         var criteriaVals = new List<int>();
         for (int i = 0; i < criteriaAmount; i++)
         {
-            var randomValue = (RndGen.Next() % CriteriaValueRange) + 1;
+            var randomValue = (RndGen.Next() % MConstants.CriteriaValueRange) + 1;
             criteriaVals.Add(randomValue);
         }
         var name = GenerateUniqueName();
@@ -22,7 +21,7 @@ public static class CandidateFactory
     
     public static List<CandidateDto> CreateCandidateList(int candidateAmount = 5, int? criteriaAmount = null)
     {
-        int criteriaCount = criteriaAmount ?? MConstants.CriteriaAmount;
+        int criteriaCount = criteriaAmount ?? MConstants.DefaultCriteriaAmount;
         
         var candidates = new List<CandidateDto>();
         for (int i = 0; i < candidateAmount; i++)

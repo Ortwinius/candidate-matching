@@ -5,6 +5,8 @@ namespace CandidateMatching.Application.Ranking;
 
 public abstract class RankingService : IRankingService
 {
+    public abstract RankingStrategy StrategyKey { get; }
+    
     public abstract RankingResultDto PerformRanking(List<CandidateDto> candidates, double[] weights);
     
     public virtual double[,] GetNormalizedMatrix(double[,] decisionMatrix)

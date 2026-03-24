@@ -1,32 +1,25 @@
-using CandidateMatching.Application.Ranking;
 using CandidateMatching.Domain;
 using CandidateMatching.Lib;
 
-namespace CandidateMatching.Application.Benchmark;
-//
-// public interface IBenchmarkRunner<TA, TB>
-//     where TA : IRankingService
-//     where TB : IRankingService
-// {
-//     public void RunBenchmark(Func<RankingResultsPair, int> metricFunc, int iterations, int? candidateAmount, int? criteriaAmount);
-//     public RankingResultsPair GetRankingResults(List<CandidateDto> candidates, double[] weights);
-// }
+namespace CandidateMatching.Application.Testing;
 
-public class MetricTestRunner<TA, TB>(TA topsis, TB wsm)
-    where TA : TopsisRankingService 
-    where TB : WsmRankingService 
+public class TopsisWsmTestRunner(IRankingContext algorithms) : ITestRunner
 {
+    private readonly IRankingService _topsis = algorithms.Resolve(RankingStrategy.Topsis);
+    private readonly IRankingService _wsm = algorithms.Resolve(RankingStrategy.Wsm);
+    
     private readonly List<PairMetric> _pairMetrics = MetricRegistry.PairMetrics;
     private readonly List<SingleMetric> _singleMetrics = MetricRegistry.SingleMetrics;
 
-    public void RunBenchmark(int iterations, int? candidateAmount = null, int? criteriaAmount = null)
+    public TestResultDto RunTests(int iterations, int candidateAmount, int criteriaAmount, double[]? weights = null)
     {
-        double[] weights = [0.3, 0.1, 0.1, 0.2, 0.3];
-        // double[] weights = [0.05, 0.05, 0.1, 0.05, 0.1, 0.1, 0.1, 0.08, 0.02, 0.35];
+        // double[] weightsToUse = weights ?? WeightFactory.CreateWeights(criteriaAmount);
+        double[] weightsToUse = weights ?? WeightFactory.GetDefaultWeights();
         
-        int candidateNumber = candidateAmount ?? MConstants.DefaultCandidateAmount;
-        
-        MDebug.PrintWeights(weights);
+        if (weightsToUse.Length != criteriaAmount)
+        {
+            throw new ArgumentException("The amount of criteria specified is invalid.");
+        }
         
         // initialize all data with 0 
         var pairTotals = _pairMetrics.ToDictionary(x => x.Key, _ => 0d);
@@ -35,12 +28,12 @@ public class MetricTestRunner<TA, TB>(TA topsis, TB wsm)
 
         for (int i = 0; i < iterations; i++)
         {
-            var candidates = CandidateFactory.CreateCandidateList(candidateNumber, criteriaAmount: weights.Length);
-            var results = GetRankingResults(candidates, weights);
+            var candidates = CandidateFactory.CreateCandidateList(candidateAmount, criteriaAmount: weightsToUse.Length);
+            var results = GetRankingResults(candidates, weightsToUse);
 
-            var ctx = new BenchmarkContext(
+            var ctx = new TestingContext(
                 Candidates: candidates,
-                Weights: weights,
+                Weights: weightsToUse,
                 Results: results
             );
 
@@ -53,22 +46,42 @@ public class MetricTestRunner<TA, TB>(TA topsis, TB wsm)
             // aggregating singlemetrics to a total score
             foreach (var metric in _singleMetrics)
             {
-                topsisTotals[metric.Key] += metric.Calculate(ctx, results.TopsisResult, topsis);
-                wsmTotals[metric.Key] += metric.Calculate(ctx, results.WsmResult, wsm);
+                topsisTotals[metric.Key] += metric.Calculate(ctx, results.TopsisResult, _topsis);
+                wsmTotals[metric.Key] += metric.Calculate(ctx, results.WsmResult, _wsm);
             }
         }
 
-        PrintResults(iterations, weights, candidateNumber, pairTotals, topsisTotals, wsmTotals);
+        PrintResultsToConsole(iterations, weightsToUse, candidateAmount, pairTotals, topsisTotals, wsmTotals);
+        
+        return new TestResultDto
+        {
+            Iterations = iterations,
+            CandidateAmount = candidateAmount, 
+            CriteriaAmount = criteriaAmount,
+            Weights = weightsToUse,
+            PairResults = pairTotals.ToDictionary(
+                x => x.Key,
+                x => x.Value / iterations
+            ),
+            TopsisResults = topsisTotals.ToDictionary(
+                x => x.Key,
+                x => x.Value / iterations
+            ),
+            WsmResults = wsmTotals.ToDictionary(
+                x => x.Key,
+                x => x.Value / iterations
+            ),
+        };
     }
 
     public RankingResultsPair GetRankingResults(List<CandidateDto> candidates, double[] weights)
     {
-        var topsisRes = topsis.PerformRanking(candidates, weights);
-        var wsmRes = wsm.PerformRanking(candidates, weights);
+        var topsisRes = _topsis.PerformRanking(candidates, weights);
+        var wsmRes = _wsm.PerformRanking(candidates, weights);
         return new RankingResultsPair(TopsisResult: topsisRes, WsmResult: wsmRes);
     }
 
-    private void PrintResults(
+    private void PrintResultsToConsole(
         int iterations,
         double[] weights, 
         int candidateAmount,

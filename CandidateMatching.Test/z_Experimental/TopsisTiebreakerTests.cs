@@ -1,5 +1,5 @@
-using CandidateMatching.Application.Benchmark;
 using CandidateMatching.Application.Ranking;
+using CandidateMatching.Application.Testing;
 using CandidateMatching.Domain;
 using CandidateMatching.Lib;
 using Microsoft.Extensions.Logging.Abstractions;

@@ -6,6 +6,8 @@ namespace CandidateMatching.Application.Ranking;
 // Topsis Implementation of Ranking
 public class TopsisRankingService(ILogger<TopsisRankingService> logger): RankingService
 {
+    public override RankingStrategy StrategyKey { get; } = RankingStrategy.Topsis;
+    
     public override RankingResultDto PerformRanking(List<CandidateDto> candidates, double[] weights)
     {
         logger.Log(LogLevel.Information, "Starting TOPSIS ranking process");

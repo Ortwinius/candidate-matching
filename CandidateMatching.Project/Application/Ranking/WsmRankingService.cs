@@ -5,6 +5,8 @@ namespace CandidateMatching.Application.Ranking;
 
 public class WsmRankingService(ILogger<WsmRankingService> logger) : RankingService
 {
+    public override RankingStrategy StrategyKey { get; } = RankingStrategy.Wsm;
+    
     public override RankingResultDto PerformRanking(List<CandidateDto> candidates, double[] weights)
     {
         logger.Log(LogLevel.Information, "Starting WSM ranking process");
