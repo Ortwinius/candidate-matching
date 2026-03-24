@@ -1,6 +1,6 @@
+using CandidateMatching.Application.Ranking;
 using CandidateMatching.Domain;
 using CandidateMatching.Lib;
-using CandidateMatching.Services;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace CandidateMatching.Test.Wsm;

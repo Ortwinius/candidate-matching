@@ -1,24 +1,25 @@
+using CandidateMatching.Application.Ranking;
+using CandidateMatching.Application.Testing;
 using CandidateMatching.Domain;
-using CandidateMatching.Services;
-using CandidateMatching.Test.Helpers;
+using CandidateMatching.Lib;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace CandidateMatching.Test.Topsis;
+namespace CandidateMatching.Test.Wsm;
 
 [TestFixture]
-public class TopsisRankReversalTests
+public class WsmRankReversalTests
 {
-    private IRankingService _topsisService;
+    private IRankingService _wsmRankingService;
     // private List<CandidateDto> _candidates = new List<CandidateDto>();
     private double[] _weights = [];
     
     [SetUp]
     public void Setup()
     {
-        var logger = new NullLogger<TopsisRankingService>();
-        _topsisService = new TopsisRankingService(logger);
+        var logger = new NullLogger<WsmRankingService>();
+        _wsmRankingService = new WsmRankingService(logger);
         
-        _weights = [ 0.3, 0.2, 0.2, 0.3 ];  
+        _weights = [ 0.3, 0.2, 0.1, 0.1, 0.3 ];  
     }
     
     [Test]
@@ -34,18 +35,20 @@ public class TopsisRankReversalTests
             var candidates = CandidateFactory.CreateCandidateList(candidateAmount: candidateCount);
         
             // Act
-            var initialRanking = _topsisService.PerformRanking(candidates, _weights);
+            var initialRanking = _wsmRankingService.PerformRanking(candidates, _weights);
             var initialTopCandidate = initialRanking.Rankings.First().Candidate;
             var initialWorstCandidate = initialRanking.Rankings.Last().Candidate;
             
             var reducedCandidates = candidates.Where(c => c != initialWorstCandidate).ToList();
-            var newRanking = _topsisService.PerformRanking(reducedCandidates, _weights);
+            var newRanking = _wsmRankingService.PerformRanking(reducedCandidates, _weights);
             var newTopCandidate = newRanking.Rankings[0].Candidate;
             
             if (initialTopCandidate.Name != newTopCandidate.Name)
             {
                 reversalCount++;
-                // LogReversalDetails(i, initialRanking, newRanking);
+                MDebug.PrintRanking(initialRanking, label: "Old ranking");
+                MDebug.PrintRanking(newRanking, label: "New ranking");
+                LogReversalDetails(i, initialRanking, newRanking);
             }
         }
 

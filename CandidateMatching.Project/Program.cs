@@ -1,11 +1,22 @@
+using System.Text.Json.Serialization;
+using CandidateMatching.Application.Ranking;
+using CandidateMatching.Application.Testing;
 using CandidateMatching.Domain;
-using CandidateMatching.Services;
+using CandidateMatching.Lib;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IRankingService, TopsisRankingService>();
+builder.Services.AddScoped<IRankingService, WsmRankingService>();
+builder.Services.AddScoped<IRankingContext, RankingContext>();
+builder.Services.AddScoped<ITestRunner, TopsisWsmTestRunner>();
+    
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
-builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -63,7 +74,25 @@ var candidates = new List<CandidateDto>
 var weights = new double[] { 0.3, 0.2, 0.2, 0.3 };  
 
 using var scope = app.Services.CreateScope();
-var rankingService = scope.ServiceProvider.GetRequiredService<IRankingService>();
-var ranking = rankingService.PerformRanking(candidates, weights);
+// var rankingService = scope.ServiceProvider.GetRequiredService<IRankingService>();
+
+
+// var context = scope.ServiceProvider.GetRequiredService<IRankingContext>();
+// var strategy = context.Resolve(RankingStrategy.Topsis);
+// var result = strategy.PerformRanking(candidates, weights);
+
+// var topsisLogger = new NullLogger<TopsisRankingService>();
+// var wsmLogger = new NullLogger<WsmRankingService>();
+// var topsisRankingService = new TopsisRankingService(topsisLogger);
+// var wsmRankingService = new WsmRankingService(wsmLogger);
+//
+// var metricTestRunner = new MetricTestRunner<TopsisRankingService, WsmRankingService>(topsisRankingService, wsmRankingService);
+//
+// metricTestRunner.RunTests(iterations: 10000, candidateAmount: 25);
+
+
+
+// var ranking = topsisRankingService.PerformRanking(candidates, weights);
+// MDebug.PrintRanking(result, precision: 5);
 
 app.Run();

@@ -1,13 +1,15 @@
 using CandidateMatching.Domain;
 using CandidateMatching.Lib;
 
-namespace CandidateMatching.Services;
+namespace CandidateMatching.Application.Ranking;
 
 public class WsmRankingService(ILogger<WsmRankingService> logger) : RankingService
 {
+    public override RankingStrategy StrategyKey { get; } = RankingStrategy.Wsm;
+    
     public override RankingResultDto PerformRanking(List<CandidateDto> candidates, double[] weights)
     {
-        logger.Log(LogLevel.Information, "Starting TOPSIS ranking process");
+        logger.Log(LogLevel.Information, "Starting WSM ranking process");
 
         if (candidates[0].CriteriaVals.Count != weights.Length)
         {
@@ -19,7 +21,7 @@ public class WsmRankingService(ILogger<WsmRankingService> logger) : RankingServi
             throw new InvalidOperationException("Sum of weights must equal 1");
         }
         
-        var matrixBuilder = new MMatrixBuilder();
+        var matrixBuilder = new MatrixBuilder();
         matrixBuilder.AddRows(candidates);
         var matrix = matrixBuilder.Build();
             

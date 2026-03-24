@@ -1,9 +1,8 @@
 using CandidateMatching.Domain;
 
-namespace CandidateMatching.Lib;
+namespace CandidateMatching.Application;
 
-// TODO: add logger
-public class MMatrixBuilder()
+public class MatrixBuilder()
 {
     private int Cols { get; set; } = 0;
     private readonly List<List<int>> _matrixSkeleton = [];

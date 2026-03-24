@@ -1,12 +1,14 @@
 using CandidateMatching.Domain;
 using CandidateMatching.Lib;
 
-namespace CandidateMatching.Services;
+namespace CandidateMatching.Application.Ranking;
 
 public abstract class RankingService : IRankingService
 {
+    public abstract RankingStrategy StrategyKey { get; }
+    
     public abstract RankingResultDto PerformRanking(List<CandidateDto> candidates, double[] weights);
-
+    
     public virtual double[,] GetNormalizedMatrix(double[,] decisionMatrix)
     {
         return decisionMatrix.ApplyLinearMaxNormalization();

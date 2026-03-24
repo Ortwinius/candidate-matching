@@ -1,3 +1,4 @@
+using CandidateMatching.Application;
 using CandidateMatching.Domain;
 
 namespace CandidateMatching.Lib;
@@ -73,4 +74,22 @@ public static class MDebug
             Console.WriteLine($"{i+1}.: {current.Candidate.Name} - Score: {current.RankingVal.ToString(format)}");
         }
     }
+
+    // TODO: also print weight name after Refactor of weights
+    public static void PrintWeights(double[] weights)
+    {
+        Console.Write("[ ");
+        foreach (var weight in weights)
+        {
+            Console.Write(weight + " ");
+        }
+
+        Console.WriteLine($"] = {weights.Length}");
+    }
+
+    // public static void PrintCandidateNames(CandidateDto candidates)
+    // {
+    //     Console.WriteLine("Candidates: ");
+    //      
+    // }
 }
