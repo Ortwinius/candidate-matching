@@ -19,7 +19,7 @@ public class TestingController(
         var res = runner.RunTests(
             iterations: request.Iterations, 
             candidateAmount: request.CandidateAmount ?? MConstants.DefaultCandidateAmount, 
-            criteriaAmount: request.CriteriaAmount ?? MConstants.DefaultCriteriaAmount,
+            criteriaAmount: request.CriteriaAmount,
             weights: request.Weights
             );
         

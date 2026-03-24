@@ -6,13 +6,14 @@ public static class WeightFactory
 {
     private static readonly Random RndGen = new Random(Guid.NewGuid().GetHashCode());
 
-    public static double[] GetDefaultWeights()
+    public static double[] CreateWeights(int? amount = null)
     {
-        return [0.3, 0.1, 0.1, 0.2, 0.3];
-    }
-    public static double[] CreateWeights(int amount)
-    {
-        double[] weights = new double[amount];
+        if (amount is null or 0)
+        {
+            return GetDefaultWeights();
+        }
+        
+        double[] weights = new double[(int)amount];
         
         for (int i = 0; i < amount; i++)
         {
@@ -30,5 +31,10 @@ public static class WeightFactory
         }
 
         return normalized;
+    }
+    
+    public static double[] GetDefaultWeights()
+    {
+        return [0.3, 0.1, 0.1, 0.2, 0.3];
     }
 }

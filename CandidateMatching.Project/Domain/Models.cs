@@ -42,9 +42,9 @@ public sealed record TestResultDto
     public required int CandidateAmount { get; set; }
     public required int CriteriaAmount { get; set; } 
     public required double[] Weights { get; set; }
-    public required Dictionary<string, double> PairResults { get; set; }
-    public required Dictionary<string, double> TopsisResults { get; set; }
-    public required Dictionary<string, double> WsmResults { get; set; }
+    public required Dictionary<string, string> PairResults { get; set; }
+    public required Dictionary<string, string> TopsisResults { get; set; }
+    public required Dictionary<string, string> WsmResults { get; set; }
 }
 
 public sealed record Ideals(double[] Ideal, double[] AntiIdeal);
