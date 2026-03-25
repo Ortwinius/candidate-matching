@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using CandidateMatching.Domain;
 using CandidateMatching.Lib;
 
@@ -37,10 +38,46 @@ public static class StatisticMetrics
         return 0d;
     }
 
-    // TODO
+    /*Checks if ranking correlation is > 90% */
     public static double SpearmanMetric(RankingResultsPair data)
     {
-        return 0d;
+        Console.WriteLine("Calculating Spearman Metric");
+        
+        Debug.Assert(data.TopsisResult.Rankings.Count == data.WsmResult.Rankings.Count, "Warning: Rankings count is not the same!");
+        
+        var candidateCount = data.TopsisResult.Rankings.Count;
+        if (candidateCount < 2)
+        {
+            return 1d;
+        }
+        
+        var topsisRankingsMap = new Dictionary<Guid, int>();
+        var wsmRankingsMap = new Dictionary<Guid, int>();
+
+        // mapping every candidate name to its rank, for topsis as well as wsm
+        for (int i = 0; i < candidateCount; i++)
+        {
+            var topsisEntry = new KeyValuePair<Guid, int>(data.TopsisResult.Rankings[i].Candidate.Id, i + 1);
+            var wsmEntry = new KeyValuePair<Guid, int>(data.WsmResult.Rankings[i].Candidate.Id, i + 1);
+            
+            topsisRankingsMap.Add(topsisEntry.Key, topsisEntry.Value);
+            wsmRankingsMap.Add(wsmEntry.Key, wsmEntry.Value);
+        }
+
+        double[] diffPerRank = new double[candidateCount];
+        
+        for (int i = 0; i < candidateCount; i++)
+        {
+            var candidateId = data.TopsisResult.Rankings[i].Candidate.Id;
+            diffPerRank[i] = topsisRankingsMap[candidateId] -
+                             wsmRankingsMap[candidateId];
+        }
+
+        double squaredDiffSum = diffPerRank.Select(d => Math.Pow(d, 2)).Sum();
+
+        double result = 1 - ((6 * squaredDiffSum) / (candidateCount * (Math.Pow(candidateCount, 2) - 1)));
+
+        return result > 90 ? 1d : 0d;
     }
 }
 

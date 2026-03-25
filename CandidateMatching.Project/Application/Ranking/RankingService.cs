@@ -33,8 +33,6 @@ public abstract class RankingService : IRankingService
             result.Rankings.Add(new CandidateResult(Candidate: candidates[i], RankingVal: performances[i]));
         }
         
-        // TODO: check for identicals (lexical sorting) 
-        
         var sorted = MHelpers.SortResults(result);
         return sorted;
     }

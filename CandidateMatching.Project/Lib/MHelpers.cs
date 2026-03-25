@@ -9,7 +9,7 @@ public static class MHelpers
 
     public static RankingResultDto SortResults(RankingResultDto ranking)
     {
-        var res = ranking.Rankings.OrderByDescending(x => x.RankingVal).ToList();
+        var res = ranking.Rankings.OrderByDescending(x => x.RankingVal).ThenByDescending(x => x.Candidate.Name).ToList();
         return new RankingResultDto(res);
     }
 
