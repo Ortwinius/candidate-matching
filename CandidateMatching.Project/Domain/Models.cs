@@ -53,7 +53,10 @@ public sealed record IdealDistances(double IdealDistance, double AntiIdealDistan
 
 public sealed record CandidateResult(CandidateDto Candidate, double RankingVal);
 
-public sealed record RankingResultDto(List<CandidateResult> Rankings);
+public sealed record RankingResultDto{
+    public CandidateDto? Top1 { get; set; }
+    public required List<CandidateResult> Rankings { get; set; }
+};
 
 public sealed record RankingResultsPair(RankingResultDto TopsisResult, RankingResultDto WsmResult);
 
