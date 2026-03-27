@@ -3,7 +3,7 @@ using CandidateMatching.Application.Testing;
 using CandidateMatching.Domain;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace CandidateMatching.Test.Topsis;
+namespace CandidateMatching.Test.z_Experimental;
 
 [TestFixture]
 public class TopsisRankReversalTests

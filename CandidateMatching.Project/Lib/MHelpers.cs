@@ -6,11 +6,13 @@ namespace CandidateMatching.Lib;
 
 public static class MHelpers
 {
-
-    public static RankingResultDto SortResults(RankingResultDto ranking)
+    public static RankingResultDto SortResultsByPerformance(RankingResultDto ranking)
     {
-        var res = ranking.Rankings.OrderByDescending(x => x.RankingVal).ToList();
-        return new RankingResultDto(res);
+        var res = ranking.Rankings.OrderByDescending(x => x.RankingVal).ThenByDescending(x => x.Candidate.Name).ToList();
+        return new RankingResultDto{
+            Rankings = res,
+            Top1 = res.First().Candidate
+        };
     }
 
     public static bool WeightsAddUptoOne(double[] weights) => Math.Abs(weights.Sum() - 1.0) < 1e-9;

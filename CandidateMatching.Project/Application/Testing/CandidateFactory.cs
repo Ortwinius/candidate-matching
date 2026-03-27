@@ -19,7 +19,7 @@ public static class CandidateFactory
         return new CandidateDto{Name = name, CriteriaVals = criteriaVals};
     }
     
-    public static List<CandidateDto> CreateCandidateList(int candidateAmount = 5, int? criteriaAmount = null)
+    public static List<CandidateDto> CreateCandidateList(int candidateAmount, int? criteriaAmount = null)
     {
         int criteriaCount = criteriaAmount ?? MConstants.DefaultCriteriaAmount;
         

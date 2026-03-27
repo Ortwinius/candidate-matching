@@ -5,13 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace CandidateMatching.Api;
 
 [ApiController]
-[Route("/api")]
+[Route("/api/")]
 public class TestingController(
     ILogger<RankingController> logger,
     ITestRunner runner
     ): ControllerBase
 {
-    [HttpPost(Name = "test")]
+    [HttpPost("test")]
     public ActionResult<TestResultDto> Post([FromBody] TestRequestDto request)
     {
         logger.Log(LogLevel.Information, $"Starting Test");
@@ -19,7 +19,7 @@ public class TestingController(
         var res = runner.RunTests(
             iterations: request.Iterations, 
             candidateAmount: request.CandidateAmount ?? MConstants.DefaultCandidateAmount, 
-            criteriaAmount: request.CriteriaAmount ?? MConstants.DefaultCriteriaAmount,
+            criteriaAmount: request.CriteriaAmount,
             weights: request.Weights
             );
         

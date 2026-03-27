@@ -4,7 +4,7 @@ using CandidateMatching.Domain;
 using CandidateMatching.Lib;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace CandidateMatching.Test.Topsis;
+namespace CandidateMatching.Test.z_Experimental;
 
 [TestFixture]
 public class TopsisTiebreakerTests
@@ -22,7 +22,7 @@ public class TopsisTiebreakerTests
     }
 
     [Test]
-    public void GenerateTiebreakerStatistics()
+    public void GenerateTieRateStatistics()
     {
         int iterations = 100;
         int tiebreakerCount = 0;

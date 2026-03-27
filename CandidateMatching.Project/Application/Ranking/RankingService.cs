@@ -21,7 +21,10 @@ public abstract class RankingService : IRankingService
     
     protected RankingResultDto MapCandidatesToResults(double[] performances, List<CandidateDto> candidates)
     {
-        var result = new RankingResultDto(new List<CandidateResult>());
+        var result = new RankingResultDto
+        {
+            Rankings = new List<CandidateResult>()
+        };
         
         if (performances.Length != candidates.Count)
         {
@@ -33,9 +36,8 @@ public abstract class RankingService : IRankingService
             result.Rankings.Add(new CandidateResult(Candidate: candidates[i], RankingVal: performances[i]));
         }
         
-        // TODO: check for identicals (lexical sorting) 
+        var sorted = MHelpers.SortResultsByPerformance(result);
         
-        var sorted = MHelpers.SortResults(result);
         return sorted;
     }
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using CandidateMatching.Domain;
 using CandidateMatching.Lib;
 
@@ -13,7 +14,7 @@ public static class MetricRegistry
 
     public static readonly List<SingleMetric> SingleMetrics =
     [
-        new("tiebreaker", BenchMetrics.TiebreakerMetric),
+        new("tie_rate", BenchMetrics.TieMetric),
         new("winner_margin", BenchMetrics.WinnerMarginMetric),
         new("type_2_rank_reversal", BenchMetrics.Type2RankReversalMetric),
         new("type_1_rank_reversal", BenchMetrics.Type1RankReversalMetric),
@@ -37,18 +38,54 @@ public static class StatisticMetrics
         return 0d;
     }
 
-    // TODO
+    /*Checks if ranking correlation is > 90% */
     public static double SpearmanMetric(RankingResultsPair data)
     {
-        return 0d;
+        Console.WriteLine("Calculating Spearman Metric");
+        
+        Debug.Assert(data.TopsisResult.Rankings.Count == data.WsmResult.Rankings.Count, "Warning: Rankings count is not the same!");
+        
+        var candidateCount = data.TopsisResult.Rankings.Count;
+        if (candidateCount < 2)
+        {
+            return 1d;
+        }
+        
+        var topsisRankingsMap = new Dictionary<Guid, int>();
+        var wsmRankingsMap = new Dictionary<Guid, int>();
+
+        // mapping every candidate name to its rank, for topsis as well as wsm
+        for (int i = 0; i < candidateCount; i++)
+        {
+            var topsisEntry = new KeyValuePair<Guid, int>(data.TopsisResult.Rankings[i].Candidate.Id, i + 1);
+            var wsmEntry = new KeyValuePair<Guid, int>(data.WsmResult.Rankings[i].Candidate.Id, i + 1);
+            
+            topsisRankingsMap.Add(topsisEntry.Key, topsisEntry.Value);
+            wsmRankingsMap.Add(wsmEntry.Key, wsmEntry.Value);
+        }
+
+        double[] diffPerRank = new double[candidateCount];
+        
+        for (int i = 0; i < candidateCount; i++)
+        {
+            var candidateId = data.TopsisResult.Rankings[i].Candidate.Id;
+            diffPerRank[i] = topsisRankingsMap[candidateId] -
+                             wsmRankingsMap[candidateId];
+        }
+
+        double squaredDiffSum = diffPerRank.Select(d => Math.Pow(d, 2)).Sum();
+
+        double result = 1 - ((6 * squaredDiffSum) / (candidateCount * (Math.Pow(candidateCount, 2) - 1)));
+
+        return result > 90 ? 1d : 0d;
     }
 }
 
 // Used for single algorithms, has to be run for each algo independently if they should be compared 
 public static class BenchMetrics
 {
-    // checks if there is at least one tiebreaker in an iteration
-    public static double TiebreakerMetric(
+    // checks if there is at least one tie in an iteration
+    public static double TieMetric(
         TestingContext ctx,
         RankingResultDto originalRanking,
         IRankingService rankingService
@@ -65,7 +102,7 @@ public static class BenchMetrics
     
             if (Math.Abs(prev - current) < 1e-7)
             {
-                LogMetricIncident(nameof(TiebreakerMetric), iteration: i);
+                LogMetricIncident(nameof(TieMetric), iteration: i);
                 
                 // Console.WriteLine($"    Affected No1: {originalRanking.Rankings[i - 1].Candidate.Name.Substring(0,7)} ({originalRanking.Rankings[i - 1].RankingVal})");
                 // Console.WriteLine($"    Affected No2: {originalRanking.Rankings[i].Candidate.Name.Substring(0,7)} ({originalRanking.Rankings[i].RankingVal})");
