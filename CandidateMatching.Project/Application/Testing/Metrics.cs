@@ -14,7 +14,7 @@ public static class MetricRegistry
 
     public static readonly List<SingleMetric> SingleMetrics =
     [
-        new("tiebreaker", BenchMetrics.TiebreakerMetric),
+        new("tie_rate", BenchMetrics.TieMetric),
         new("winner_margin", BenchMetrics.WinnerMarginMetric),
         new("type_2_rank_reversal", BenchMetrics.Type2RankReversalMetric),
         new("type_1_rank_reversal", BenchMetrics.Type1RankReversalMetric),
@@ -84,8 +84,8 @@ public static class StatisticMetrics
 // Used for single algorithms, has to be run for each algo independently if they should be compared 
 public static class BenchMetrics
 {
-    // checks if there is at least one tiebreaker in an iteration
-    public static double TiebreakerMetric(
+    // checks if there is at least one tie in an iteration
+    public static double TieMetric(
         TestingContext ctx,
         RankingResultDto originalRanking,
         IRankingService rankingService
@@ -102,7 +102,7 @@ public static class BenchMetrics
     
             if (Math.Abs(prev - current) < 1e-7)
             {
-                LogMetricIncident(nameof(TiebreakerMetric), iteration: i);
+                LogMetricIncident(nameof(TieMetric), iteration: i);
                 
                 // Console.WriteLine($"    Affected No1: {originalRanking.Rankings[i - 1].Candidate.Name.Substring(0,7)} ({originalRanking.Rankings[i - 1].RankingVal})");
                 // Console.WriteLine($"    Affected No2: {originalRanking.Rankings[i].Candidate.Name.Substring(0,7)} ({originalRanking.Rankings[i].RankingVal})");
