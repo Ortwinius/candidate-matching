@@ -14,6 +14,13 @@ public enum RankingStrategy
     Wsm
 }
 
+public record CriterionDto
+{
+    public string? Name { get; set; } = String.Empty;
+    public required double Weight { get; set; }
+    // public bool IsBenefit { get; set; } = true;
+}
+
 public sealed record CandidateDto
 {
     public Guid Id { get; } = System.Guid.NewGuid();
@@ -24,7 +31,8 @@ public sealed record CandidateDto
 public sealed record RankingRequestDto
 {
     public required List<CandidateDto>? Candidates { get; set; }
-    public required double[]? Weights{ get; set; }
+    // public required double[]? Weights{ get; set; }
+    public required List<CriterionDto>? Criteria { get; set; }
     public required RankingStrategy Strategy { get; set; }
 }
 
@@ -46,10 +54,6 @@ public sealed record TestResultDto
     public required Dictionary<string, string> TopsisResults { get; set; }
     public required Dictionary<string, string> WsmResults { get; set; }
 }
-
-public sealed record Ideals(double[] Ideal, double[] AntiIdeal);
-
-public sealed record IdealDistances(double IdealDistance, double AntiIdealDistance);
 
 public sealed record CandidateResult(CandidateDto Candidate, double RankingVal);
 
@@ -75,3 +79,9 @@ public sealed record SingleMetric(
     string Key,
     Func<TestingContext, RankingResultDto, IRankingService, double> Calculate
 );
+
+// Topsis Specific - could be put in Ranking Use Case
+public sealed record Ideals(double[] Ideal, double[] AntiIdeal);
+
+public sealed record IdealDistances(double IdealDistance, double AntiIdealDistance);
+
