@@ -1,43 +1,59 @@
-using CandidateMatching.Domain;
-using CandidateMatching.Lib;
+    using CandidateMatching.Domain;
+    using CandidateMatching.Lib;
 
-namespace CandidateMatching.Application.Ranking;
+    namespace CandidateMatching.Application.Ranking;
 
-public abstract class RankingService : IRankingService
-{
-    public abstract RankingStrategy StrategyKey { get; }
-    
-    public abstract RankingResultDto PerformRanking(List<CandidateDto> candidates, double[] weights);
-    
-    public virtual double[,] GetNormalizedMatrix(double[,] decisionMatrix)
+    public abstract class RankingService : IRankingService
     {
-        return decisionMatrix.ApplyLinearMaxNormalization();
-    }
-
-    public double[,] GetWeightedNormalizedMatrix(double[,] normalizedMatrix, double[] weights)
-    {
-        return normalizedMatrix.ApplyWeights(weights);
-    }
-    
-    protected RankingResultDto MapCandidatesToResults(double[] performances, List<CandidateDto> candidates)
-    {
-        var result = new RankingResultDto
-        {
-            Rankings = new List<CandidateResult>()
-        };
+        public abstract RankingStrategy StrategyKey { get; }
         
-        if (performances.Length != candidates.Count)
+        public abstract RankingResultDto PerformRanking(List<CandidateDto> candidates, double[] weights);
+        
+        public virtual double[,] GetNormalizedMatrix(double[,] decisionMatrix)
         {
-            throw new InvalidOperationException("Closeness factors count must equal candidate count");
+            return decisionMatrix.ApplyLinearMaxNormalization();
+        }
+
+        public double[,] GetWeightedNormalizedMatrix(double[,] normalizedMatrix, double[] weights)
+        {
+            return normalizedMatrix.ApplyWeights(weights);
+        }
+
+        protected void AssertValidInput(List<CandidateDto> candidates, double[] weights)
+        {
+            if (candidates == null || candidates.Count == 0)
+                throw new ArgumentException("Candidates must not be empty.", nameof(candidates));
+
+            if (candidates[0].CriteriaVals.Count != weights.Length)
+            {
+                throw new ArgumentException("Amount of criteria must match weights");
+            }
+
+            if (!MHelpers.WeightsAddUptoOne(weights))
+            {
+                throw new InvalidOperationException("Sum of weights must equal 1");
+            }
         }
         
-        for(int i = 0; i < candidates.Count; i++)
+        protected RankingResultDto MapCandidatesToResults(double[] performances, List<CandidateDto> candidates)
         {
-            result.Rankings.Add(new CandidateResult(Candidate: candidates[i], RankingVal: performances[i]));
+            var result = new RankingResultDto
+            {
+                Rankings = new List<CandidateResult>()
+            };
+            
+            if (performances.Length != candidates.Count)
+            {
+                throw new InvalidOperationException("Closeness factors count must equal candidate count");
+            }
+            
+            for(int i = 0; i < candidates.Count; i++)
+            {
+                result.Rankings.Add(new CandidateResult(Candidate: candidates[i], RankingVal: performances[i]));
+            }
+            
+            var sorted = MHelpers.SortResultsByPerformance(result);
+            
+            return sorted;
         }
-        
-        var sorted = MHelpers.SortResultsByPerformance(result);
-        
-        return sorted;
     }
-}

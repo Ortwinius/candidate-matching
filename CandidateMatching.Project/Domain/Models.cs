@@ -31,10 +31,18 @@ public sealed record CandidateDto
 public sealed record RankingRequestDto
 {
     public required List<CandidateDto>? Candidates { get; set; }
-    // public required double[]? Weights{ get; set; }
     public required List<CriterionDto>? Criteria { get; set; }
     public required RankingStrategy Strategy { get; set; }
 }
+
+public sealed record CandidateResult(CandidateDto Candidate, double RankingVal);
+
+public sealed record RankingResultDto{
+    public CandidateDto? Top1 { get; set; }
+    public required List<CandidateResult> Rankings { get; set; }
+};
+
+public sealed record RankingResultsPair(RankingResultDto TopsisResult, RankingResultDto WsmResult);
 
 public sealed record TestRequestDto
 {
@@ -50,24 +58,29 @@ public sealed record TestResultDto
     public required int CandidateAmount { get; set; }
     public required int CriteriaAmount { get; set; } 
     public required double[] Weights { get; set; }
+    // public required List<CriterionDto> Criteria { get; set; }
     public required Dictionary<string, string> PairResults { get; set; }
     public required Dictionary<string, string> TopsisResults { get; set; }
     public required Dictionary<string, string> WsmResults { get; set; }
+    public TestingEnvironmentDto? TestEnvironment { get; set; } = null;
 }
-
-public sealed record CandidateResult(CandidateDto Candidate, double RankingVal);
-
-public sealed record RankingResultDto{
-    public CandidateDto? Top1 { get; set; }
-    public required List<CandidateResult> Rankings { get; set; }
-};
-
-public sealed record RankingResultsPair(RankingResultDto TopsisResult, RankingResultDto WsmResult);
 
 public sealed record TestingContext(
     List<CandidateDto> Candidates,
     double[] Weights,
     RankingResultsPair Results
+);
+
+public sealed record TestingEnvironmentDto
+{
+    public string? RuntimeInSeconds { get; set; }
+    public string? ProcessorCoresUsed { get; set; }
+}
+
+public sealed record MetricResults(
+    Dictionary<string, double> Pair,
+    Dictionary<string, double> Topsis,
+    Dictionary<string, double> Wsm
 );
 
 public sealed record PairMetric(

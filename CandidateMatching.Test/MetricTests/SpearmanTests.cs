@@ -1,4 +1,3 @@
-// TODO: DELETE
 // using CandidateMatching.Application.Testing;
 // using CandidateMatching.Domain;
 //
