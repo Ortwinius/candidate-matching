@@ -6,9 +6,12 @@ using CandidateMatching.Lib;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Ranking Use Case
 builder.Services.AddScoped<IRankingService, TopsisRankingService>();
 builder.Services.AddScoped<IRankingService, WsmRankingService>();
 builder.Services.AddScoped<IRankingContext, RankingContext>();
+
+// Test Use Case
 builder.Services.AddScoped<ITestRunner, TopsisWsmTestRunner>();
     
 builder.Services.AddControllers()

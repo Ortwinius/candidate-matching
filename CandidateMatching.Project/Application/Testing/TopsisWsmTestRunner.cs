@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using CandidateMatching.Domain;
 using CandidateMatching.Lib;
@@ -12,8 +13,17 @@ public class TopsisWsmTestRunner(IRankingContext algorithms) : ITestRunner
     private readonly List<PairMetric> _pairMetrics = MetricRegistry.PairMetrics;
     private readonly List<SingleMetric> _singleMetrics = MetricRegistry.SingleMetrics;
 
-    public TestResultDto RunTests(int iterations, int candidateAmount, int? criteriaAmount = null, double[]? weights = null)
+    private readonly object _totalsLock = new();
+    
+    public TestResultDto RunTests(
+        int iterations, 
+        int candidateAmount, 
+        int? criteriaAmount = null, 
+        double[]? weights = null
+        )
     {
+        var sw = Stopwatch.StartNew();
+        
         double[] weightsToUse = weights ?? WeightFactory.CreateWeights(criteriaAmount);
 
         if (criteriaAmount != null && criteriaAmount != weightsToUse.Length)
@@ -21,59 +31,94 @@ public class TopsisWsmTestRunner(IRankingContext algorithms) : ITestRunner
             throw new InvalidOperationException("Amount of criteria must match weights");
         }
         
-        // initialize all test metric data with 0 
-        var pairTotals = _pairMetrics.ToDictionary(x => x.Key, _ => 0d);
-        var topsisTotals = _singleMetrics.ToDictionary(x => x.Key, _ => 0d);
-        var wsmTotals = _singleMetrics.ToDictionary(x => x.Key, _ => 0d);
+        // initialize all test metric data which will be aggregated with 0 
+        var finalResults = CreateEmptyMetricResults();
 
-        for (int i = 0; i < iterations; i++)
+        var options = new ParallelOptions()
         {
-            var candidates = CandidateFactory.CreateCandidateList(candidateAmount, criteriaAmount: weightsToUse.Length);
-            var results = GetRankingResults(candidates, weightsToUse);
+            MaxDegreeOfParallelism = Environment.ProcessorCount
+            // MaxDegreeOfParallelism = 1
+        };
 
-            var ctx = new TestingContext(
-                Candidates: candidates,
-                Weights: weightsToUse,
-                Results: results
-            );
-
-            // aggregating pairmetrics to a total score
-            foreach (var metric in _pairMetrics)
+        /*
+         * Initializing metric result object which will
+         * be partitioned into batches in localInit and regathered in the localFinally
+        */
+        Parallel.For(
+            fromInclusive: 0,
+            toExclusive: iterations,
+            parallelOptions: options,
+            localInit: CreateEmptyMetricResults,
+            body: (i, state, local) =>
             {
-                pairTotals[metric.Key] += metric.Calculate(ctx);
-            }
+                var candidates = CandidateFactory.CreateCandidateList(
+                    candidateAmount,
+                    criteriaAmount: weightsToUse.Length
+                );
 
-            // aggregating singlemetrics to a total score
-            foreach (var metric in _singleMetrics)
+                var results = GetRankingResults(candidates, weightsToUse);
+
+                var ctx = new TestingContext(
+                    Candidates: candidates,
+                    Weights: weightsToUse,
+                    Results: results
+                );
+
+                foreach (var metric in _pairMetrics)
+                {
+                    local.Pair[metric.Key] += metric.Calculate(ctx);
+                }
+
+                foreach (var metric in _singleMetrics)
+                {
+                    local.Topsis[metric.Key] += metric.Calculate(ctx, results.TopsisResult, _topsis);
+                    local.Wsm[metric.Key] += metric.Calculate(ctx, results.WsmResult, _wsm);
+                }
+
+                return local;
+            },
+            localFinally: local =>
             {
-                topsisTotals[metric.Key] += metric.Calculate(ctx, results.TopsisResult, _topsis);
-                wsmTotals[metric.Key] += metric.Calculate(ctx, results.WsmResult, _wsm);
-            }
-        }
-
-        PrintResultsToConsole(iterations, weightsToUse, candidateAmount, pairTotals, topsisTotals, wsmTotals);
+                lock (_totalsLock)
+                {
+                    AddTotals(finalResults.Pair, local.Pair);
+                    AddTotals(finalResults.Topsis, local.Topsis);
+                    AddTotals(finalResults.Wsm, local.Wsm);
+                }
+            });
+        
+        PrintResultsToConsole(iterations, weightsToUse, candidateAmount, finalResults.Pair, finalResults.Topsis, finalResults.Wsm);
+        
+        sw.Stop();
+        var elapsed = sw.Elapsed;
         
         return new TestResultDto
         {
             Iterations = iterations,
             CandidateAmount = candidateAmount, 
             CriteriaAmount = criteriaAmount ?? MConstants.DefaultCriteriaAmount,
+            // Criteria = weightsToUse!.Select(w => new CriterionDto(){Weight = w}).ToList(),
             Weights = weightsToUse,
-            PairResults = pairTotals.ToDictionary(
+            PairResults = finalResults.Pair.ToDictionary(
                 x => x.Key,
                 x => ConvertMetricResultToString(x.Value, iterations)
             ),
-            TopsisResults = topsisTotals.ToDictionary(
+            TopsisResults = finalResults.Topsis.ToDictionary(
                 x => x.Key,
                 x => ConvertMetricResultToString(x.Value, iterations)
             ),
-            WsmResults = wsmTotals.ToDictionary(
+            WsmResults = finalResults.Wsm.ToDictionary(
                 x => x.Key,
                 x => ConvertMetricResultToString(x.Value, iterations)
             ),
+            TestEnvironment = new TestingEnvironmentDto()
+            {
+                RuntimeInSeconds = $"{elapsed.TotalSeconds:F7}s",
+                ProcessorCoresUsed = Environment.ProcessorCount.ToString()
+            }
         };
     }
-
+    
     public RankingResultsPair GetRankingResults(List<CandidateDto> candidates, double[] weights)
     {
         var topsisRes = _topsis.PerformRanking(candidates, weights);
@@ -81,6 +126,25 @@ public class TopsisWsmTestRunner(IRankingContext algorithms) : ITestRunner
         return new RankingResultsPair(TopsisResult: topsisRes, WsmResult: wsmRes);
     }
 
+    private void AddTotals(
+        Dictionary<string, double> totals,
+        Dictionary<string, double> current)
+    {
+        foreach (var kv in current)
+        {
+            totals[kv.Key] += kv.Value;
+        }
+    }
+
+    private MetricResults CreateEmptyMetricResults()
+    {
+        return new MetricResults(
+            Pair: _pairMetrics.ToDictionary(x => x.Key, _ => 0d),
+            Topsis: _singleMetrics.ToDictionary(x => x.Key, _ => 0d),
+            Wsm: _singleMetrics.ToDictionary(x => x.Key, _ => 0d)
+        );
+    }
+    
     private void PrintResultsToConsole(
         int iterations,
         double[] weights, 
@@ -119,10 +183,5 @@ public class TopsisWsmTestRunner(IRankingContext algorithms) : ITestRunner
     private string ConvertMetricResultToString(double res, int iterations)
     {
         return ($"{res} / {iterations} => {res / (double)iterations * 100:F5}%");
-    }
-
-    private string ConvertMetricResultToPercentDouble(double res, int iterations)
-    {
-        return (res / (double)iterations).ToString(CultureInfo.InvariantCulture);
     }
 }

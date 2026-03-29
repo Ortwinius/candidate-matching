@@ -21,4 +21,9 @@ public static class MHelpers
     {
         return ranking.Rankings.Select(c => Math.Round(c.RankingVal, precision ?? MConstants.RoundingPrecision)).ToArray();
     }
+    
+    public static double[] ConvertCriteriaSpecToWeightList(List<CriterionDto> criteriaSpec)
+    {
+        return criteriaSpec.Select(c => c.Weight).ToArray();
+    }
 }

@@ -14,15 +14,22 @@ public class TestingController(
     [HttpPost("test")]
     public ActionResult<TestResultDto> Post([FromBody] TestRequestDto request)
     {
-        logger.Log(LogLevel.Information, $"Starting Test");
-        
-        var res = runner.RunTests(
-            iterations: request.Iterations, 
-            candidateAmount: request.CandidateAmount ?? MConstants.DefaultCandidateAmount, 
-            criteriaAmount: request.CriteriaAmount,
-            weights: request.Weights
+        logger.Log(LogLevel.Information, $"Received test request");
+
+        try
+        {
+            var res = runner.RunTests(
+                iterations: request.Iterations,
+                candidateAmount: request.CandidateAmount ?? MConstants.DefaultCandidateAmount,
+                criteriaAmount: request.CriteriaAmount,
+                weights: request.Weights
             );
-        
-        return Ok(res);
+
+            return Ok(res);
+        }
+        catch (Exception e)
+        {
+            return BadRequest("Error while processing test request: " + e.Message);
+        }
     }
 }

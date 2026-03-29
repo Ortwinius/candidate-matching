@@ -9,17 +9,9 @@ public class WsmRankingService(ILogger<WsmRankingService> logger) : RankingServi
     
     public override RankingResultDto PerformRanking(List<CandidateDto> candidates, double[] weights)
     {
+        AssertValidInput(candidates, weights);
+        
         logger.Log(LogLevel.Information, "Starting WSM ranking process");
-
-        if (candidates[0].CriteriaVals.Count != weights.Length)
-        {
-            throw new ArgumentException("Amount of criteria must match weights");
-        }
-
-        if (!MHelpers.WeightsAddUptoOne(weights))
-        {
-            throw new InvalidOperationException("Sum of weights must equal 1");
-        }
         
         var matrixBuilder = new MatrixBuilder();
         matrixBuilder.AddRows(candidates);

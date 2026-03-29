@@ -8,28 +8,25 @@ public static class MetricRegistry
 {
     public static readonly List<PairMetric> PairMetrics =
     [
-        new("hit_ratio", ctx => StatisticMetrics.HitRatioMetric(ctx.Results)),
-        new("spearman", ctx => StatisticMetrics.SpearmanMetric(ctx.Results))
+        new("hit_ratio_hundred_percent", ctx => HitRatioMetric(ctx.Results)),
+        new("spearman_over_95", ctx => SpearmanMetric(ctx.Results))
     ];
 
     public static readonly List<SingleMetric> SingleMetrics =
     [
-        new("tie_rate", BenchMetrics.TieMetric),
-        new("winner_margin", BenchMetrics.WinnerMarginMetric),
-        new("type_2_rank_reversal", BenchMetrics.Type2RankReversalMetric),
-        new("type_1_rank_reversal", BenchMetrics.Type1RankReversalMetric),
-        new("weight_sensitivity", BenchMetrics.Top1WeightSensitivityMetric)
+        new("tie_rate", TieMetric),
+        new("winner_margin", WinnerMarginMetric),
+        new("type_2_rank_reversal", Type2RankReversalMetric),
+        new("type_1_rank_reversal", Type1RankReversalMetric),
+        new("weight_sensitivity", Top1WeightSensitivityMetric)
     ];
-}
-
-public static class StatisticMetrics
-{
+    
     public static double HitRatioMetric(RankingResultsPair data)
     {
         var topsisTop1 = data.TopsisResult.Rankings.First().Candidate;
         var wsmTop1 = data.WsmResult.Rankings.First().Candidate;
 
-        if (topsisTop1.Name == wsmTop1.Name)
+        if (topsisTop1.Id == wsmTop1.Id)
         {
             // Console.WriteLine($"Incident: {topsisTop1.Name}: TOPSIS ({data.TopsisResult.Rankings.First().RankingVal}) = WSM ({data.WsmResult.Rankings.First().RankingVal})");
             return 1d;
@@ -41,8 +38,6 @@ public static class StatisticMetrics
     /*Checks if ranking correlation is > 90% */
     public static double SpearmanMetric(RankingResultsPair data)
     {
-        Console.WriteLine("Calculating Spearman Metric");
-        
         Debug.Assert(data.TopsisResult.Rankings.Count == data.WsmResult.Rankings.Count, "Warning: Rankings count is not the same!");
         
         var candidateCount = data.TopsisResult.Rankings.Count;
@@ -77,14 +72,10 @@ public static class StatisticMetrics
 
         double result = 1 - ((6 * squaredDiffSum) / (candidateCount * (Math.Pow(candidateCount, 2) - 1)));
 
-        return result > 90 ? 1d : 0d;
+        return result > 0.95 ? 1d : 0d;
     }
-}
-
-// Used for single algorithms, has to be run for each algo independently if they should be compared 
-public static class BenchMetrics
-{
-    // checks if there is at least one tie in an iteration
+    
+     // checks if there is at least one tie in an iteration
     public static double TieMetric(
         TestingContext ctx,
         RankingResultDto originalRanking,
@@ -162,7 +153,7 @@ public static class BenchMetrics
 
         
         var modifiedCandidates = ctx.Candidates
-            .Select(c => c.Name == initialWorstCandidate.Name ? worseCandidate : c)
+            .Select(c => c.Id == initialWorstCandidate.Id ? worseCandidate : c)
             .ToList();
 
         var rerun = rankingService.PerformRanking(modifiedCandidates, ctx.Weights);
@@ -194,20 +185,20 @@ public static class BenchMetrics
 
         var initialWorstCandidate = initialRanking.Rankings.Last().Candidate;
             
-        var reducedCandidates = ctx.Candidates.Where(c => c.Name != initialWorstCandidate.Name).ToList();
+        var reducedCandidates = ctx.Candidates.Where(c => c.Id != initialWorstCandidate.Id).ToList();
         
         var rerun = rankingService.PerformRanking(reducedCandidates, ctx.Weights);
         
-        var originalNamesMinusWorst = initialRanking.Rankings
-            .Select(x => x.Candidate.Name)
-            .Where(name => reducedCandidates.Any(c => c.Name == name))
+        var originalCandidatesMinusWorst = initialRanking.Rankings
+            .Select(x => x.Candidate.Id)
+            .Where(id => reducedCandidates.Any(c => c.Id == id))
             .ToList();
         
-        var rerunNames = rerun.Rankings
-            .Select(x => x.Candidate.Name)
+        var rerunCandidates = rerun.Rankings
+            .Select(x => x.Candidate.Id)
             .ToList();
 
-        if (!originalNamesMinusWorst.SequenceEqual(rerunNames))
+        if (!originalCandidatesMinusWorst.SequenceEqual(rerunCandidates))
         {
             LogMetricIncident(nameof(Type1RankReversalMetric));
             // MDebug.PrintRanking(initialRanking, label: "Original Ranking");
@@ -235,8 +226,8 @@ public static class BenchMetrics
 
         var rerun = rankingService.PerformRanking(ctx.Candidates, normalizedModifiedWeights);
 
-        var originalTop1 = originalRanking.Rankings.First().Candidate.Name;
-        var newTop1 = rerun.Rankings.First().Candidate.Name;
+        var originalTop1 = originalRanking.Rankings.First().Candidate.Id;
+        var newTop1 = rerun.Rankings.First().Candidate.Id;
 
         // return originalTop1 == newTop1 ? 0d : 1d;
         if (originalTop1 != newTop1)

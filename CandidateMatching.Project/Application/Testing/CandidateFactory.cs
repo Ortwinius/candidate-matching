@@ -4,17 +4,19 @@ namespace CandidateMatching.Application.Testing;
 
 public static class CandidateFactory
 {
-    private static readonly Random RndGen = new Random(Guid.NewGuid().GetHashCode());
+    // private static readonly Random RndGen = new Random(Guid.NewGuid().GetHashCode());
     
     public static CandidateDto CreateCandidate(int criteriaAmount)
     {
+        
         var criteriaVals = new List<int>();
         for (int i = 0; i < criteriaAmount; i++)
         {
-            var randomValue = (RndGen.Next() % MConstants.CriteriaValueRange) + 1;
+            var randomValue = Random.Shared.Next(1, MConstants.CriteriaValueRange + 1);
+            // var randomValue = (RndGen.Next() % MConstants.CriteriaValueRange) + 1;
             criteriaVals.Add(randomValue);
         }
-        var name = GenerateUniqueName();
+        var name = GenerateName();
 
         return new CandidateDto{Name = name, CriteriaVals = criteriaVals};
     }
@@ -32,16 +34,17 @@ public static class CandidateFactory
         return candidates;
     }
     
-    public static string GenerateUniqueName()
+    public static string GenerateName()
     {
-        var firstName = FirstNames[RndGen.Next(FirstNames.Length)];
-        var lastName = LastNames[RndGen.Next(LastNames.Length)];
-        var code = RndGen.Next(100, 1000); 
+        var name = $"{Names[Random.Shared.Next(Names.Length)]}";
+        // var code = $"{Guid.NewGuid():N}";
+        // var fullName = $"{name}{code}";
+        // return fullName;
         
-        return $"{firstName}{lastName}{code}";
+        return name;
     }
     
-    private static readonly string[] FirstNames =
+    private static readonly string[] Names =
     [
         "James", "Mary", "Robert", "Patricia", "John", "Jennifer", "Michael", "Linda", 
         "David", "Elizabeth", "William", "Barbara", "Richard", "Susan", "Joseph", "Jessica", 
@@ -49,11 +52,5 @@ public static class CandidateFactory
         "Matthew", "Betty", "Anthony", "Sandra", "Mark", "Ashley", "Donald", "Dorothy", 
         "Steven", "Kimberly", "Andrew", "Emily", "Paul", "Donna", "Joshua", "Michelle", 
         "Kenneth", "Carol", "Kevin", "Amanda", "Brian", "Melissa", "George", "Deborah"
-    ];
-
-    private static readonly string[] LastNames =
-    [
-        "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", 
-        "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson"
     ];
 }
