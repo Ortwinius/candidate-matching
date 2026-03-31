@@ -1,6 +1,4 @@
-using CandidateMatching.Domain;
-
-namespace CandidateMatching.Domain;
+namespace CandidateMatching.Domain.Ranking;
 
 public interface IRankingService
 {

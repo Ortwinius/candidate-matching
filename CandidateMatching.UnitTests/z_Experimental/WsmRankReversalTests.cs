@@ -1,10 +1,11 @@
-using CandidateMatching.Application.Ranking;
-using CandidateMatching.Application.Testing;
+using CandidateMatching.Application.Ranking.Services;
+using CandidateMatching.Application.Testing.Factories;
 using CandidateMatching.Domain;
+using CandidateMatching.Domain.Ranking;
 using CandidateMatching.Lib;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace CandidateMatching.Test.Wsm;
+namespace CandidateMatching.UnitTests.Wsm;
 
 [TestFixture]
 public class WsmRankReversalTests

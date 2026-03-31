@@ -1,6 +1,7 @@
 using CandidateMatching.Domain;
+using CandidateMatching.Domain.Ranking;
 
-namespace CandidateMatching.Application.Ranking;
+namespace CandidateMatching.Application.Ranking.Context;
 
 public class RankingContext: IRankingContext
 {

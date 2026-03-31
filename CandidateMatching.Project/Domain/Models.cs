@@ -1,8 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
-using System.Text.Json.Serialization;
-using CandidateMatching.Application;
-using CandidateMatching.Application.Ranking;
+using CandidateMatching.Domain.Ranking;
 
 namespace CandidateMatching.Domain;
 

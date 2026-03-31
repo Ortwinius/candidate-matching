@@ -1,7 +1,12 @@
 using System.Text.Json.Serialization;
 using CandidateMatching.Application.Ranking;
+using CandidateMatching.Application.Ranking.Context;
+using CandidateMatching.Application.Ranking.Services;
 using CandidateMatching.Application.Testing;
+using CandidateMatching.Application.Testing.Services;
 using CandidateMatching.Domain;
+using CandidateMatching.Domain.Ranking;
+using CandidateMatching.Domain.Testing;
 using CandidateMatching.Lib;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +17,7 @@ builder.Services.AddScoped<IRankingService, WsmRankingService>();
 builder.Services.AddScoped<IRankingContext, RankingContext>();
 
 // Test Use Case
-builder.Services.AddScoped<ITestRunner, TopsisWsmTestRunner>();
+builder.Services.AddScoped<ITestService, TopsisWsmTestService>();
     
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

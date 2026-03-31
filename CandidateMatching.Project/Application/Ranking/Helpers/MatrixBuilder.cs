@@ -1,6 +1,6 @@
 using CandidateMatching.Domain;
 
-namespace CandidateMatching.Application;
+namespace CandidateMatching.Application.Ranking.Helpers;
 
 public class MatrixBuilder()
 {

@@ -1,6 +1,7 @@
+using CandidateMatching.Application.Ranking.Helpers;
 using CandidateMatching.Lib;
 
-namespace CandidateMatching.Application.Testing;
+namespace CandidateMatching.Application.Testing.Factories;
 
 public static class WeightFactory
 {

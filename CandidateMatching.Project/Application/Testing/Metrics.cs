@@ -1,5 +1,8 @@
 using System.Diagnostics;
+using CandidateMatching.Application.Ranking;
+using CandidateMatching.Application.Ranking.Helpers;
 using CandidateMatching.Domain;
+using CandidateMatching.Domain.Ranking;
 using CandidateMatching.Lib;
 
 namespace CandidateMatching.Application.Testing;

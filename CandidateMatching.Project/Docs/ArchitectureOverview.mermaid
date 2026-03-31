@@ -1,0 +1,41 @@
+flowchart TB
+    Client[Client]
+
+    subgraph API["API Layer"]
+        RankingCtrl[RankingController]
+        TestingCtrl[TestingController]
+    end
+
+    subgraph App["Application Layer"]
+        RankCtx[RankingContext]
+        Topsis[TOPSIS Ranking Service]
+        Wsm[WSM Ranking Service]
+        TestService[Test Service]
+        CandFactory[Candidate Factory]
+%%        WeightFactory[Weight Factory]
+        Metrics[Metrics]
+    end
+
+    subgraph Domain["Domain Layer"]
+        Models[DTOs / Interfaces / Enums]
+    end
+
+    Client --> RankingCtrl
+    Client --> TestingCtrl
+
+    RankingCtrl --> RankCtx
+    RankCtx --> Topsis
+    RankCtx --> Wsm
+
+    TestingCtrl --> TestService
+    TestService --> CandFactory
+%%    TestService --> WeightFactory
+    TestService --> RankCtx
+    TestService --> Metrics
+
+    RankingCtrl --> Models
+    TestingCtrl --> Models
+    RankCtx --> Models
+    Topsis --> Models
+    Wsm --> Models
+    TestService --> Models

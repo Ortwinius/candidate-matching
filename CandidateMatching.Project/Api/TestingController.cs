@@ -1,5 +1,6 @@
 using CandidateMatching.Application;
 using CandidateMatching.Domain;
+using CandidateMatching.Domain.Testing;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CandidateMatching.Api;
@@ -8,7 +9,7 @@ namespace CandidateMatching.Api;
 [Route("/api/")]
 public class TestingController(
     ILogger<RankingController> logger,
-    ITestRunner runner
+    ITestService service
     ): ControllerBase
 {
     [HttpPost("test")]
@@ -18,7 +19,7 @@ public class TestingController(
 
         try
         {
-            var res = runner.RunTests(
+            var res = service.RunTests(
                 iterations: request.Iterations,
                 candidateAmount: request.CandidateAmount ?? MConstants.DefaultCandidateAmount,
                 criteriaAmount: request.CriteriaAmount,

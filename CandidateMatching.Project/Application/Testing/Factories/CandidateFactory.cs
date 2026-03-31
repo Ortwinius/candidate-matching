@@ -1,6 +1,6 @@
 using CandidateMatching.Domain;
 
-namespace CandidateMatching.Application.Testing;
+namespace CandidateMatching.Application.Testing.Factories;
 
 public static class CandidateFactory
 {

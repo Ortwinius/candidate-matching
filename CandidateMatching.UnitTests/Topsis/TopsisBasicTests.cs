@@ -1,9 +1,10 @@
-﻿using CandidateMatching.Application.Ranking;
+﻿using CandidateMatching.Application.Ranking.Services;
 using CandidateMatching.Domain;
+using CandidateMatching.Domain.Ranking;
 using CandidateMatching.Lib;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace CandidateMatching.Test.Topsis;
+namespace CandidateMatching.UnitTests.Topsis;
 
 [TestFixture]
 public class Tests

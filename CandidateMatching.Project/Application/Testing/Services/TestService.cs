@@ -1,11 +1,13 @@
 using System.Diagnostics;
-using System.Globalization;
+using CandidateMatching.Application.Testing.Factories;
 using CandidateMatching.Domain;
+using CandidateMatching.Domain.Ranking;
+using CandidateMatching.Domain.Testing;
 using CandidateMatching.Lib;
 
-namespace CandidateMatching.Application.Testing;
+namespace CandidateMatching.Application.Testing.Services;
 
-public class TopsisWsmTestRunner(IRankingContext algorithms) : ITestRunner
+public class TopsisWsmTestService(IRankingContext algorithms) : ITestService
 {
     private readonly IRankingService _topsis = algorithms.Resolve(RankingStrategy.Topsis);
     private readonly IRankingService _wsm = algorithms.Resolve(RankingStrategy.Wsm);

@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CandidateMatching.Project", "CandidateMatching.Project\CandidateMatching.Project.csproj", "{A5C43DFC-5061-4AAD-8F6A-757C434598C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CandidateMatching.Test", "CandidateMatching.Test\CandidateMatching.Test.csproj", "{A728D592-FC8D-42E6-9D49-516CE31772F7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CandidateMatching.UnitTests", "CandidateMatching.UnitTests\CandidateMatching.UnitTests.csproj", "{A728D592-FC8D-42E6-9D49-516CE31772F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

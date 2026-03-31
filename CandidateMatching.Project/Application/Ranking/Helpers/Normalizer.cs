@@ -1,6 +1,4 @@
-using System.Diagnostics;
-
-namespace CandidateMatching.Application;
+namespace CandidateMatching.Application.Ranking.Helpers;
 
 public static class Normalizer
 {

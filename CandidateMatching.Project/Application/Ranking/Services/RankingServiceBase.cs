@@ -1,7 +1,9 @@
-    using CandidateMatching.Domain;
-    using CandidateMatching.Lib;
+using CandidateMatching.Application.Ranking.Helpers;
+using CandidateMatching.Domain;
+using CandidateMatching.Domain.Ranking;
+using CandidateMatching.Lib;
 
-    namespace CandidateMatching.Application.Ranking;
+namespace CandidateMatching.Application.Ranking.Services;
 
     public abstract class RankingService : IRankingService
     {

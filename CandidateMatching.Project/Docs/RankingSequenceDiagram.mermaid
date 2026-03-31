@@ -1,0 +1,50 @@
+sequenceDiagram
+    autonumber
+    actor User as Client / User
+    participant RC as RankingController
+    participant CX as RankingContext
+    participant RS as IRankingService
+    participant MB as MatrixBuilder
+    participant N as Normalizer
+
+    User->>RC: POST /api/rank<br/>(candidates, criteria, strategy)
+    activate RC
+
+    RC->>RC: Validate request
+    alt invalid input
+        RC-->>User: 400 Bad Request
+        deactivate RC
+    else valid input
+        activate RC
+        RC->>CX: Resolve(strategy)
+        CX-->>RC: Ranking service instance
+
+        RC->>RS: PerformRanking(candidates, weights)
+        activate RS
+        
+        RS->>RS: Assert valid input
+        RS->>MB: AddRows(candidates)
+        RS->>MB: Build()
+        MB-->>RS: decision matrix
+
+        RS->>N: Apply normalization to matrix
+        N-->>RS: normalized matrix
+
+        RS->>N: ApplyWeights(normalizedMatrix, weights)
+        N-->>RS: weighted normalized matrix
+
+        alt TOPSIS strategy
+            RS->>RS: Compute ideal / anti-ideal solutions
+            RS->>RS: Compute distances & closeness factors
+        else WSM strategy
+            RS->>RS: Sum weighted criteria scores
+        end
+
+        RS->>RS: Map performances to ranking results
+        RS->>RS: Sort results
+        RS-->>RC: RankingResultDto
+        deactivate RS
+
+        RC-->>User: 200 OK<br/>ranking result
+        deactivate RC
+    end

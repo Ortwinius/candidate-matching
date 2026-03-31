@@ -1,5 +1,6 @@
 using CandidateMatching.Application.Ranking;
 using CandidateMatching.Domain;
+using CandidateMatching.Domain.Ranking;
 using CandidateMatching.Lib;
 using Microsoft.AspNetCore.Mvc;
 

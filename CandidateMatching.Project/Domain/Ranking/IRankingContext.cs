@@ -1,4 +1,4 @@
-namespace CandidateMatching.Domain;
+namespace CandidateMatching.Domain.Ranking;
 
 public interface IRankingContext
 {

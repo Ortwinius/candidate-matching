@@ -1,7 +1,7 @@
 // using CandidateMatching.Application.Testing;
 // using CandidateMatching.Domain;
 //
-// namespace CandidateMatching.Test.MetricTests;
+// namespace CandidateMatching.UnitTests.MetricTests;
 //
 // [TestFixture]
 // public class SpearmanTests

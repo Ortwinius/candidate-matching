@@ -1,7 +1,7 @@
+using CandidateMatching.Application.Ranking.Helpers;
 using CandidateMatching.Domain;
-using CandidateMatching.Lib;
 
-namespace CandidateMatching.Application.Ranking;
+namespace CandidateMatching.Application.Ranking.Services;
 
 // Topsis Implementation of Ranking
 public class TopsisRankingService(ILogger<TopsisRankingService> logger): RankingService
