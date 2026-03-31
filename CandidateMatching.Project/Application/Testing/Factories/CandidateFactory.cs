@@ -4,8 +4,6 @@ namespace CandidateMatching.Application.Testing.Factories;
 
 public static class CandidateFactory
 {
-    // private static readonly Random RndGen = new Random(Guid.NewGuid().GetHashCode());
-    
     public static CandidateDto CreateCandidate(int criteriaAmount)
     {
         
@@ -13,7 +11,6 @@ public static class CandidateFactory
         for (int i = 0; i < criteriaAmount; i++)
         {
             var randomValue = Random.Shared.Next(1, MConstants.CriteriaValueRange + 1);
-            // var randomValue = (RndGen.Next() % MConstants.CriteriaValueRange) + 1;
             criteriaVals.Add(randomValue);
         }
         var name = GenerateName();
@@ -34,16 +31,14 @@ public static class CandidateFactory
         return candidates;
     }
     
-    public static string GenerateName()
+    private static string GenerateName()
     {
         var name = $"{Names[Random.Shared.Next(Names.Length)]}";
-        // var code = $"{Guid.NewGuid():N}";
-        // var fullName = $"{name}{code}";
-        // return fullName;
-        
         return name;
     }
     
+    // List of names so that you dont have to write them yourself
+    // (obviously, ID must still be used tho for unique identifier)
     private static readonly string[] Names =
     [
         "James", "Mary", "Robert", "Patricia", "John", "Jennifer", "Michael", "Linda", 

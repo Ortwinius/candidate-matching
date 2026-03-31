@@ -1,0 +1,47 @@
+sequenceDiagram
+    autonumber
+    actor User as Client / User
+    participant TC as TestingController
+    participant TS as ITestService
+    participant WF as WeightFactory
+    participant CF as CandidateFactory
+    participant MC as MetricRegistry
+    participant CX as RankingContext
+
+    User->>+TC: POST /api/test<br/>(iterations, candidateAmount, criteriaAmount, weights)
+    TC->>TC: Validate request
+    alt Invalid input
+        TC-->>User: 400 Bad Request
+        deactivate TC
+    else Valid input
+        activate TC
+        TC->>+TS: RunTests(iterations, candidateAmount, criteriaAmount, weights)
+
+        %% Step: Candidate and Weight Generation
+        TS->>+WF: Generate weights (unless specified)
+        WF-->>TS: Weights
+        TS->>+CF: Create candidates (unless specified)
+        CF-->>TS: Candidate list 
+
+        %% Step: Ranking and Metrics
+        loop For each iteration
+            %% Get algo instances
+            TS->>TS: Prepare testing context (candidates, weights)
+            TS->>CX: Get instances of algorithms to compare
+            CX-->>TS: Ranking Instances (TOPSIS & WSM)
+
+            %% Execute Rankings
+            TS->>TopsisRankingService: PerformRanking(candidates, weights)
+            TS->>WsmRankingService: PerformRanking(candidates, weights)
+
+            %% Calculate Metrics
+            TS->>+MC: Calculate all pair and single metrics
+            MC-->>TS: Metric results
+        end
+
+        TS-->>TC: TestResultDto
+        deactivate TS
+
+        TC-->>User: 200 OK<br/>Test Result
+        deactivate TC
+    end

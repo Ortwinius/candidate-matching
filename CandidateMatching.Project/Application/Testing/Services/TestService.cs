@@ -26,6 +26,7 @@ public class TopsisWsmTestService(IRankingContext algorithms) : ITestService
     {
         var sw = Stopwatch.StartNew();
         
+        // currently defaults to [0.2, 0.2, 0.2, 0.2, 0.2] if no weight count is provided
         double[] weightsToUse = weights ?? WeightFactory.CreateWeights(criteriaAmount);
 
         if (criteriaAmount != null && criteriaAmount != weightsToUse.Length)
@@ -39,7 +40,6 @@ public class TopsisWsmTestService(IRankingContext algorithms) : ITestService
         var options = new ParallelOptions()
         {
             MaxDegreeOfParallelism = Environment.ProcessorCount
-            // MaxDegreeOfParallelism = 1
         };
 
         /*
@@ -147,6 +147,11 @@ public class TopsisWsmTestService(IRankingContext algorithms) : ITestService
         );
     }
     
+    private string ConvertMetricResultToString(double res, int iterations)
+    {
+        return ($"{res} / {iterations} => {res / (double)iterations * 100:F5}%");
+    }
+    
     private void PrintResultsToConsole(
         int iterations,
         double[] weights, 
@@ -180,10 +185,5 @@ public class TopsisWsmTestService(IRankingContext algorithms) : ITestService
         {
             Console.WriteLine($"{kv.Key}: {kv.Value} / {iterations} ({kv.Value / iterations * 100:F2}%)");
         }
-    }
-
-    private string ConvertMetricResultToString(double res, int iterations)
-    {
-        return ($"{res} / {iterations} => {res / (double)iterations * 100:F5}%");
     }
 }
