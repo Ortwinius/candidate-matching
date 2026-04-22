@@ -5,7 +5,7 @@ using CandidateMatching.Lib;
 
 namespace CandidateMatching.Application.Ranking.Services;
 
-    public abstract class RankingService : IRankingService
+    public abstract class RankingServiceBase : IRankingService
     {
         public abstract RankingStrategy StrategyKey { get; }
         

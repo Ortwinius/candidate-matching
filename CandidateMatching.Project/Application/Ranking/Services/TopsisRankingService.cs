@@ -4,7 +4,7 @@ using CandidateMatching.Domain;
 namespace CandidateMatching.Application.Ranking.Services;
 
 // Topsis Implementation of Ranking
-public class TopsisRankingService(ILogger<TopsisRankingService> logger): RankingService
+public class TopsisRankingServiceBase(ILogger<TopsisRankingServiceBase> logger): RankingServiceBase
 {
     public override RankingStrategy StrategyKey { get; } = RankingStrategy.Topsis;
     

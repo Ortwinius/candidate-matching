@@ -31,7 +31,6 @@ public static class MetricRegistry
 
         if (topsisTop1.Id == wsmTop1.Id)
         {
-            // Console.WriteLine($"Incident: {topsisTop1.Name}: TOPSIS ({data.TopsisResult.Rankings.First().RankingVal}) = WSM ({data.WsmResult.Rankings.First().RankingVal})");
             return 1d;
         }
 
@@ -213,7 +212,7 @@ public static class MetricRegistry
     }
     
 
-    // Plan: biggest weight is reduced by 5%. Then it checks if top 1 changed
+    // Biggest weight is reduced by 5%. Then it checks if top 1 changed
     public static double Top1WeightSensitivityMetric(
         TestingContext ctx,
         RankingResultDto originalRanking,
@@ -232,7 +231,6 @@ public static class MetricRegistry
         var originalTop1 = originalRanking.Rankings.First().Candidate.Id;
         var newTop1 = rerun.Rankings.First().Candidate.Id;
 
-        // return originalTop1 == newTop1 ? 0d : 1d;
         if (originalTop1 != newTop1)
         {
             LogMetricIncident(nameof(Top1WeightSensitivityMetric));
