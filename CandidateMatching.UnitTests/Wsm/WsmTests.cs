@@ -16,8 +16,8 @@ public class WsmBasicTests
     [SetUp]
     public void Setup()
     {
-        var logger = new NullLogger<WsmRankingService>();
-        _wsmService = new WsmRankingService(logger);
+        var logger = new NullLogger<WsmRankingServiceBase>();
+        _wsmService = new WsmRankingServiceBase(logger);
     }
 
     [Test]

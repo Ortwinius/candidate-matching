@@ -7,6 +7,14 @@ public static class WeightFactory
 {
     private static readonly Random RndGen = new Random(Guid.NewGuid().GetHashCode());
 
+    /*Instead of creating weights, the MCS is using these equally
+    big default weights for everything. 
+    However, in theory this would be usable for random weight generation*/
+    public static double[] GetDefaultWeights()
+    {
+        return [0.2, 0.2, 0.2, 0.2, 0.2];
+    }
+    
     public static double[] CreateWeights(int? amount = null)
     {
         if (amount is null or 0)
@@ -32,11 +40,5 @@ public static class WeightFactory
         }
 
         return normalized;
-    }
-    
-    public static double[] GetDefaultWeights()
-    {
-        // return [0.3, 0.1, 0.1, 0.2, 0.3];
-        return [0.2, 0.2, 0.2, 0.2, 0.2];
     }
 }

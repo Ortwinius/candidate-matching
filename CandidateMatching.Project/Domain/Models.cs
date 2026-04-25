@@ -23,7 +23,7 @@ public sealed record CandidateDto
 {
     public Guid Id { get; } = System.Guid.NewGuid();
     public string? Name { get; set; } = String.Empty;
-    public required List<int> CriteriaVals { get; set; }  
+    public required List<double> CriteriaVals { get; set; }  
 }
 
 public sealed record RankingRequestDto

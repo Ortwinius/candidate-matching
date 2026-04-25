@@ -3,7 +3,6 @@ using CandidateMatching.Domain;
 
 namespace CandidateMatching.Lib;
 
-// TODO: add optional ranking result name so that in hindsight it can be traced back?
 public static class MDebug
 {
 
@@ -86,10 +85,4 @@ public static class MDebug
 
         Console.WriteLine($"] = {weights.Length}");
     }
-
-    // public static void PrintCandidateNames(CandidateDto candidates)
-    // {
-    //     Console.WriteLine("Candidates: ");
-    //      
-    // }
 }

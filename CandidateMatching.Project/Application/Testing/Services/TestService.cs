@@ -99,7 +99,6 @@ public class TopsisWsmTestService(IRankingContext algorithms) : ITestService
             Iterations = iterations,
             CandidateAmount = candidateAmount, 
             CriteriaAmount = criteriaAmount ?? MConstants.DefaultCriteriaAmount,
-            // Criteria = weightsToUse!.Select(w => new CriterionDto(){Weight = w}).ToList(),
             Weights = weightsToUse,
             PairResults = finalResults.Pair.ToDictionary(
                 x => x.Key,
@@ -152,6 +151,7 @@ public class TopsisWsmTestService(IRankingContext algorithms) : ITestService
         return ($"{res} / {iterations} => {res / (double)iterations * 100:F5}%");
     }
     
+    /* Used for Testing purposes */
     private void PrintResultsToConsole(
         int iterations,
         double[] weights, 

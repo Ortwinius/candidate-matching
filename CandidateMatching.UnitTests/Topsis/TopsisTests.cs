@@ -16,8 +16,8 @@ public class Tests
     [SetUp]
     public void Setup()
     {
-        var logger = new NullLogger<TopsisRankingService>();
-        _topsisService = new TopsisRankingService(logger);
+        var logger = new NullLogger<TopsisRankingServiceBase>();
+        _topsisService = new TopsisRankingServiceBase(logger);
     }
 
     [Test]

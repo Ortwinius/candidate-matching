@@ -7,7 +7,7 @@ public static class CandidateFactory
     public static CandidateDto CreateCandidate(int criteriaAmount)
     {
         
-        var criteriaVals = new List<int>();
+        var criteriaVals = new List<double>();
         for (int i = 0; i < criteriaAmount; i++)
         {
             var randomValue = Random.Shared.Next(1, MConstants.CriteriaValueRange + 1);
@@ -38,7 +38,7 @@ public static class CandidateFactory
     }
     
     // List of names so that you dont have to write them yourself
-    // (obviously, ID must still be used tho for unique identifier)
+    // (obviously, ID must still be used though for unique identifier)
     private static readonly string[] Names =
     [
         "James", "Mary", "Robert", "Patricia", "John", "Jennifer", "Michael", "Linda", 

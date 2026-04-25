@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using CandidateMatching.Application;
 using CandidateMatching.Domain;
 

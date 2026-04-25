@@ -5,7 +5,7 @@ namespace CandidateMatching.Application.Ranking.Helpers;
 public class MatrixBuilder()
 {
     private int Cols { get; set; } = 0;
-    private readonly List<List<int>> _matrixSkeleton = [];
+    private readonly List<List<double>> _matrixSkeleton = [];
 
     public void AddRows(List<CandidateDto> candidates)
     {

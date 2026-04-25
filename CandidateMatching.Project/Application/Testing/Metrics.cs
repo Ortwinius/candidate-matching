@@ -85,7 +85,7 @@ public static class MetricRegistry
         )
     {
         int candidateCount = originalRanking.Rankings.Count;
-        // int precision = 10;
+        
         var roundedRankingData = MHelpers.RoundRankingValues(originalRanking, precision: 15);
         
         for (int i = 1; i < candidateCount; i++)
@@ -95,11 +95,6 @@ public static class MetricRegistry
     
             if (Math.Abs(prev - current) < 1e-7)
             {
-                LogMetricIncident(nameof(TieMetric), iteration: i);
-                
-                // Console.WriteLine($"    Affected No1: {originalRanking.Rankings[i - 1].Candidate.Name.Substring(0,7)} ({originalRanking.Rankings[i - 1].RankingVal})");
-                // Console.WriteLine($"    Affected No2: {originalRanking.Rankings[i].Candidate.Name.Substring(0,7)} ({originalRanking.Rankings[i].RankingVal})");
-                
                 return 1d;
             }
         }
@@ -122,9 +117,6 @@ public static class MetricRegistry
 
         if (Math.Abs(top2Score - top1Score) < defaultMargin)
         {
-            LogMetricIncident(nameof(WinnerMarginMetric));
-            // Console.WriteLine("1.:" + ranking.Rankings[0].RankingVal);
-            // Console.WriteLine("2.:" + ranking.Rankings[1].RankingVal);
             return 1d;
         }
 
@@ -162,10 +154,6 @@ public static class MetricRegistry
         
         if (rerun.Rankings.First().Candidate.Name != initialRanking.Rankings.First().Candidate.Name)
         {
-            LogMetricIncident(nameof(Type2RankReversalMetric));
-            // MDebug.PrintRanking(initialRanking, label: "Original Ranking");
-            // MDebug.PrintRanking(rerun, label: $"Ranking without worst candidate {initialWorstCandidate.Name} with RR:");
-            // LogReversalDetails(initial: originalRanking, reduced: rerun);
             return 1d;
         }
 
@@ -202,9 +190,6 @@ public static class MetricRegistry
 
         if (!originalCandidatesMinusWorst.SequenceEqual(rerunCandidates))
         {
-            LogMetricIncident(nameof(Type1RankReversalMetric));
-            // MDebug.PrintRanking(initialRanking, label: "Original Ranking");
-            // MDebug.PrintRanking(rerun, label: $"Ranking without worst candidate {initialWorstCandidate.Name} with RR:");
             return 1d;
         }
 
@@ -233,7 +218,6 @@ public static class MetricRegistry
 
         if (originalTop1 != newTop1)
         {
-            LogMetricIncident(nameof(Top1WeightSensitivityMetric));
             return 1d;
         }
 
@@ -242,6 +226,6 @@ public static class MetricRegistry
    
     private static void LogMetricIncident(string metricType, int? iteration = null, RankingResultDto? original = null, RankingResultDto? mutated = null)
     {
-        // Console.WriteLine($"[!] {metricType}-incident occurred {(iteration != null ? $" in iteration {iteration}" : "")}");
+        Console.WriteLine($"[!] {metricType}-incident occurred {(iteration != null ? $" in iteration {iteration}" : "")}");
     }
 }

@@ -1,8 +1,6 @@
 using System.Text.Json.Serialization;
-using CandidateMatching.Application.Ranking;
 using CandidateMatching.Application.Ranking.Context;
 using CandidateMatching.Application.Ranking.Services;
-using CandidateMatching.Application.Testing;
 using CandidateMatching.Application.Testing.Services;
 using CandidateMatching.Domain;
 using CandidateMatching.Domain.Ranking;
@@ -11,12 +9,10 @@ using CandidateMatching.Lib;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Ranking Use Case
 builder.Services.AddScoped<IRankingService, TopsisRankingServiceBase>();
 builder.Services.AddScoped<IRankingService, WsmRankingServiceBase>();
 builder.Services.AddScoped<IRankingContext, RankingContext>();
 
-// Test Use Case
 builder.Services.AddScoped<ITestService, TopsisWsmTestService>();
     
 builder.Services.AddControllers()
@@ -43,64 +39,11 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-// var candidates = new List<CandidateDto>
-// {
-//     new() { Name = "Elena", CriteriaVals = [15, 40, 25, 40] },
-//     new() { Name = "Marcus", CriteriaVals = [20, 30, 20, 35] },
-//     new() { Name = "Sasha", CriteriaVals = [30, 10, 30, 15] }
-// };
-//
-// var weights = new double[4] { 0.3, 0.1, 0.4, 0.2 };
-
-// var correctNormalizedMatrix = new double[3, 4]
-// {
-//     { 0.384, 0.784, 0.570, 0.724 },
-//     { 0.512, 0.588, 0.456, 0.634 },
-//     { 0.768, 0.196, 0.684, 0.272 }
-// };
-// var correctNormalizedWeightedMatrix = new double[3, 4]
-// {
-//     { 0.115, 0.078, 0.228, 0.145 },
-//     { 0.154, 0.059, 0.182, 0.127 },
-//     { 0.230, 0.020, 0.274, 0.054 }
-// };
-// var correctIdealSolution = new double[] { 0.230, 0.078, 0.274, 0.145 };
-// var correctNegativeIdealSolution = new double[] { 0.115, 0.020, 0.182, 0.054 };
-// var correctRelativeClosenessToIdealSolution = new double[] { 0.486, 0.427, 0.576 };
-// var correctIdealSolutionSeparation = new double[] { 0.124, 0.122, 0.108 };
-// var correctNegativeIdealSolutionSeparation = new double[] { 0.117, 0.091, 0.147 };
-
-var candidates = new List<CandidateDto>
-{
-    new() { Name = "Bob", CriteriaVals = [35, 90, 80, 40] },
-    new() { Name = "Anna", CriteriaVals = [90, 15, 75, 30] },
-    new() { Name = "Karl", CriteriaVals = [85, 10, 95, 70] },
-    new() { Name = "Johanna", CriteriaVals = [95, 70, 45, 80] },
-    new() { Name = "Mohammed", CriteriaVals = [10, 90, 70, 85] },
-};
-
-var weights = new double[] { 0.3, 0.2, 0.2, 0.3 };  
-
 using var scope = app.Services.CreateScope();
-// var rankingService = scope.ServiceProvider.GetRequiredService<IRankingService>();
-
 
 // var context = scope.ServiceProvider.GetRequiredService<IRankingContext>();
-// var strategy = context.Resolve(RankingStrategy.Topsis);
+// var strategy = context.Resolve(RankingStrategy.Wsm);
 // var result = strategy.PerformRanking(candidates, weights);
-
-// var topsisLogger = new NullLogger<TopsisRankingService>();
-// var wsmLogger = new NullLogger<WsmRankingService>();
-// var topsisRankingService = new TopsisRankingService(topsisLogger);
-// var wsmRankingService = new WsmRankingService(wsmLogger);
-//
-// var metricTestRunner = new MetricTestRunner<TopsisRankingService, WsmRankingService>(topsisRankingService, wsmRankingService);
-//
-// metricTestRunner.RunTests(iterations: 10000, candidateAmount: 25);
-
-
-
-// var ranking = topsisRankingService.PerformRanking(candidates, weights);
 // MDebug.PrintRanking(result, precision: 5);
 
 app.Run();
