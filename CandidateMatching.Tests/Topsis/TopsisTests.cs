@@ -1,21 +1,21 @@
-using CandidateMatching.Application.Ranking.Services;
+﻿using CandidateMatching.Application.Ranking.Services;
 using CandidateMatching.Domain;
 using CandidateMatching.Domain.Ranking;
 using CandidateMatching.Lib;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace CandidateMatching.UnitTests.Wsm;
+namespace CandidateMatching.Tests.Topsis;
 
 [TestFixture]
-public class WsmBasicTests
+public class Tests
 {
-    private IRankingService _wsmService;
+    private IRankingService _topsisService;
     
     [SetUp]
     public void Setup()
     {
-        var logger = new NullLogger<WsmRankingServiceBase>();
-        _wsmService = new WsmRankingServiceBase(logger);
+        var logger = new NullLogger<TopsisRankingServiceBase>();
+        _topsisService = new TopsisRankingServiceBase(logger);
     }
 
     [Test]
@@ -30,11 +30,11 @@ public class WsmBasicTests
         };
         
         var weights = new double[4] { 0.3, 0.1, 0.4, 0.2 };
-        
-        var correctScores = new double[] { 0.8, 0.783, 0.717 };
+    
+        var correctScores = new double[] { 0.576, 0.486, 0.427 };
         // Act
-        var result = _wsmService.PerformRanking(candidates: candidates, weights: weights);
-
+        var result = _topsisService.PerformRanking(candidates: candidates, weights: weights);
+    
         var roundedResultScores = MHelpers.RoundRankingValues(result);
         
         // Assert
@@ -57,23 +57,22 @@ public class WsmBasicTests
             new() { Name = "Johanna", CriteriaVals = [95, 70, 45, 80] },
             new() { Name = "Mohammed", CriteriaVals = [10, 90, 70, 85] },
         };
-
+        
         var weights = new double[] { 0.3, 0.2, 0.2, 0.3 };  
         
-        var correctScores = new double[] { 0.833, 0.738, 0.679, 0.62, 0.581 };
-        
+        var correctScores = new double[] { 0.757, 0.601, 0.498, 0.498, 0.465 };
         // Act
-        var result = _wsmService.PerformRanking(candidates: candidates, weights: weights);
+        var result = _topsisService.PerformRanking(candidates: candidates, weights: weights);
 
-        var roundedClosenessFactors = MHelpers.RoundRankingValues(result);
+        var roundedResultScores = MHelpers.RoundRankingValues(result);
         
         // Assert
         Assert.That(result.Rankings.Count, Is.EqualTo(5));
-        Assert.That(roundedClosenessFactors, Is.EqualTo(correctScores).Within(0.001));
+        Assert.That(roundedResultScores, Is.EqualTo(correctScores).Within(0.001));
         Assert.That(result.Rankings[0].Candidate.Name, Is.EqualTo("Johanna"));
         Assert.That(result.Rankings[1].Candidate.Name, Is.EqualTo("Karl"));
-        Assert.That(result.Rankings[2].Candidate.Name, Is.EqualTo("Mohammed"));
-        Assert.That(result.Rankings[3].Candidate.Name, Is.EqualTo("Bob"));
-        Assert.That(result.Rankings[4].Candidate.Name, Is.EqualTo("Anna"));
+        Assert.That(result.Rankings[2].Candidate.Name, Is.EqualTo("Anna"));
+        Assert.That(result.Rankings[3].Candidate.Name, Is.EqualTo("Mohammed"));
+        Assert.That(result.Rankings[4].Candidate.Name, Is.EqualTo("Bob"));
     }
 }
