@@ -4,7 +4,7 @@ namespace CandidateMatching.Application.Ranking.Helpers;
 
 public class MatrixBuilder()
 {
-    private int Cols { get; set; } = 0;
+    private int Columns { get; set; } = 0;
     private readonly List<List<double>> _matrixSkeleton = [];
 
     public void AddRows(List<CandidateDto> candidates)
@@ -16,9 +16,9 @@ public class MatrixBuilder()
     }
     public void AddRow(CandidateDto candidate)
     {
-        if (Cols == 0) Cols = candidate.CriteriaVals.Count;
+        if (Columns == 0) Columns = candidate.CriteriaVals.Count;
         
-        if (candidate.CriteriaVals.Count != Cols)
+        if (candidate.CriteriaVals.Count != Columns)
         {
             Console.WriteLine($"Error: Candidate criteria amount does not match Matrix columns");
             return;
@@ -30,11 +30,11 @@ public class MatrixBuilder()
     public double[,] Build()
     {
         var rows = _matrixSkeleton.Count;
-        var matrix = new double[rows, Cols];
+        var matrix = new double[rows, Columns];
 
         for (int i = 0; i < rows; i++)
         {
-            for (int j = 0; j < Cols; j++)
+            for (int j = 0; j < Columns; j++)
             {
                 matrix[i, j] = _matrixSkeleton[i][j];
             }

@@ -18,7 +18,6 @@ public static class MetricRegistry
     public static readonly List<SingleMetric> SingleMetrics =
     [
         new("tie_rate", TieMetric),
-        new("winner_margin", WinnerMarginMetric),
         new("type_2_rank_reversal", Type2RankReversalMetric),
         new("type_1_rank_reversal", Type1RankReversalMetric),
         new("weight_sensitivity", Top1WeightSensitivityMetric)
@@ -99,27 +98,6 @@ public static class MetricRegistry
             }
         }
     
-        return 0d;
-    }
-    
-    /* Winner Margin Diff:
-     0.01 ~ 1%,0.02 ~ 3 %, 0.05 ~ 5% (25/30), 0.10 ~ 8% (60/65), 0.2 ~ 8% (75/85)
-    - Ofcourse values (not diff) represent gauß bell curve */
-    public static double WinnerMarginMetric(
-        TestingContext ctx,
-        RankingResultDto ranking,
-        IRankingService rankingService
-    )
-    {
-        double defaultMargin = 0.005;
-        var top1Score = ranking.Rankings[0].RankingVal;
-        var top2Score = ranking.Rankings[1].RankingVal;
-
-        if (Math.Abs(top2Score - top1Score) < defaultMargin)
-        {
-            return 1d;
-        }
-
         return 0d;
     }
     

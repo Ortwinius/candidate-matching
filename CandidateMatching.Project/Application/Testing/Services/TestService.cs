@@ -9,8 +9,8 @@ namespace CandidateMatching.Application.Testing.Services;
 
 public class TopsisWsmTestService(IRankingContext algorithms) : ITestService
 {
-    private readonly IRankingService _topsis = algorithms.Resolve(RankingStrategy.Topsis);
-    private readonly IRankingService _wsm = algorithms.Resolve(RankingStrategy.Wsm);
+    private readonly IRankingService _topsisInstance = algorithms.Resolve(RankingStrategy.Topsis);
+    private readonly IRankingService _wsmInstance = algorithms.Resolve(RankingStrategy.Wsm);
     
     private readonly List<PairMetric> _pairMetrics = MetricRegistry.PairMetrics;
     private readonly List<SingleMetric> _singleMetrics = MetricRegistry.SingleMetrics;
@@ -73,8 +73,8 @@ public class TopsisWsmTestService(IRankingContext algorithms) : ITestService
 
                 foreach (var metric in _singleMetrics)
                 {
-                    local.Topsis[metric.Key] += metric.Calculate(ctx, results.TopsisResult, _topsis);
-                    local.Wsm[metric.Key] += metric.Calculate(ctx, results.WsmResult, _wsm);
+                    local.Topsis[metric.Key] += metric.Calculate(ctx, results.TopsisResult, _topsisInstance);
+                    local.Wsm[metric.Key] += metric.Calculate(ctx, results.WsmResult, _wsmInstance);
                 }
 
                 return local;
@@ -122,8 +122,8 @@ public class TopsisWsmTestService(IRankingContext algorithms) : ITestService
     
     public RankingResultsPair GetRankingResults(List<CandidateDto> candidates, double[] weights)
     {
-        var topsisRes = _topsis.PerformRanking(candidates, weights);
-        var wsmRes = _wsm.PerformRanking(candidates, weights);
+        var topsisRes = _topsisInstance.PerformRanking(candidates, weights);
+        var wsmRes = _wsmInstance.PerformRanking(candidates, weights);
         return new RankingResultsPair(TopsisResult: topsisRes, WsmResult: wsmRes);
     }
 
